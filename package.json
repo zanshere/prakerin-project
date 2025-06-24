@@ -1,0 +1,22 @@
+{
+  "name": "prakerinproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --watch",
+    "prod": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --minify",
+    "build:icons": "node src/js/copy-icons.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.10",
+    "alpinejs": "^3.14.9",
+    "bootstrap-icons": "^1.13.1",
+    "daisyui": "^5.0.43",
+    "sweetalert2": "^11.22.1"
+  }
+}

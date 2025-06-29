@@ -4,11 +4,14 @@
   "description": "",
   "main": "tailwind.config.js",
   "scripts": {
-    "dev": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --watch",
-    "prod": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --minify",
+    "dev": "concurrently \"npm run dev:css\" \"npm run dev:js\"",
+    "dev:css": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --watch",
+    "dev:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --watch",
+    "build": "npm run build:icons && npm run build:css && npm run build:js",
+    "build:css": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --minify",
+    "build:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --minify",
     "build:icons": "node src/js/copy-icons.js",
-    "build:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm",
-    "watch:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --watch"
+    "lint": "eslint src/js/"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +25,7 @@
     "sweetalert2": "^11.22.1"
   },
   "devDependencies": {
+    "concurrently": "^9.2.0",
     "esbuild": "^0.25.5"
   }
 }

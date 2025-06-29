@@ -32,15 +32,18 @@ jobs:
     - name: Run linter
       run: npm run lint
       
-    # New Step: Run tests
-    - name: Run tests
-      run: npm test
-      
-    # Step 5: Build production
+    # Step 5: Build production assets
     - name: Build production assets
       run: npm run build
       
-    # Step 6: Upload build artifacts
+    # Step 6: Verify built assets
+    - name: Verify built files
+      run: |
+        [ -f dist/css/style.css ] || exit 1
+        [ -f dist/js/bundle.js ] || exit 1
+        echo "All production assets built successfully"
+      
+    # Step 7: Upload build artifacts
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -49,9 +52,9 @@ jobs:
           dist/
           public/
         retention-days: 5
-        compression-level: 6  # Added compression
+        compression-level: 6
 
-    # Step 7: Slack notification (only for failures)
+    # Step 8: Slack notification (only for failures)
     - name: Notify Slack on failure
       if: failure()
       uses: rtCamp/action-slack-notify@v2

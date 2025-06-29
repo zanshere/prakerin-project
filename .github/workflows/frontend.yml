@@ -28,10 +28,50 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
-        # Ensure ESLint and its plugins are installed
-        npm install --save-dev eslint eslint-plugin-alpine
+        # Ensure ESLint v9 and required packages are installed
+        npm install --save-dev eslint@^9.15.0 @eslint/js eslint-plugin-alpine
     
-    # Step 4: Run linter with proper error handling
+    # Step 4: Setup ESLint v9 configuration
+    - name: Setup ESLint v9 configuration
+      run: |
+        if [ ! -f "eslint.config.js" ]; then
+          echo "Creating ESLint v9 configuration..."
+          cat > eslint.config.js << 'EOF'
+        import js from '@eslint/js';
+        import alpine from 'eslint-plugin-alpine';
+
+        export default [
+          js.configs.recommended,
+          {
+            files: ['**/*.js'],
+            plugins: {
+              alpine
+            },
+            languageOptions: {
+              ecmaVersion: 'latest',
+              sourceType: 'module',
+              globals: {
+                console: 'readonly',
+                document: 'readonly',
+                window: 'readonly',
+                Alpine: 'readonly',
+                Swal: 'readonly'
+              }
+            },
+            rules: {
+              'indent': ['error', 2],
+              'quotes': ['error', 'single', { 'avoidEscape': true }],
+              'semi': ['error', 'always'],
+              'no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
+              'no-console': 'warn',
+              'alpine/no-direct-mutation-state': 'error'
+            }
+          }
+        ];
+        EOF
+        fi
+    
+    # Step 5: Run linter with proper error handling
     - name: Run linter
       run: |
         echo "Starting ESLint validation..."
@@ -48,13 +88,13 @@ jobs:
           echo "✅ ESLint validation passed"
         fi
       
-    # Step 5: Build production assets
+    # Step 6: Build production assets
     - name: Build production assets
       run: |
         echo "Building production assets..."
         npm run build
       
-    # Step 6: Comprehensive asset verification
+    # Step 7: Comprehensive asset verification
     - name: Verify built files
       run: |
         echo "🔍 Verifying production assets..."
@@ -91,7 +131,7 @@ jobs:
         fi
         echo "✅ All production assets verified"
       
-    # Step 7: Upload build artifacts
+    # Step 8: Upload build artifacts
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       if: success()
@@ -103,7 +143,7 @@ jobs:
         retention-days: 5
         compression-level: 6
 
-    # Step 8: Fixed Slack notification
+    # Step 9: Fixed Slack notification
     - name: Notify Slack on failure
       if: failure()
       uses: rtCamp/action-slack-notify@v2

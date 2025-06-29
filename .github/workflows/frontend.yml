@@ -75,9 +75,8 @@ jobs:
           *Repository*: ${{ github.repository }}
           *Branch*: ${{ github.ref_name }}
           *Workflow*: ${{ github.workflow }}
-          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha[:7] }}>
+          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
           *Triggered by*: ${{ github.actor }}
-          *Failed Step*: ${{ failure() && steps.*.conclusion == 'failure' && steps.*.name || 'Unknown' }}
           *Logs*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         SLACK_COLOR: '#ff0000'
         SLACK_FOOTER: 'Build failed at $(date -u)'

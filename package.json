@@ -12,7 +12,7 @@
     "build:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --minify",
     "build:icons": "node src/js/copy-icons.js",
     "lint": "eslint src/js/ --fix",
-    "lint:check": "eslint src/js/"
+    "lint:check": "eslint src/js/ --no-error-on-unmatched-pattern"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "concurrently": "^9.2.0",
     "esbuild": "^0.25.5",
+    "eslint": "^9.15.0",
     "eslint-plugin-alpine": "^1.0.0"
   }
 }

@@ -24,24 +24,34 @@ jobs:
         node-version: 22
         cache: 'npm'
     
-    # Step 3: Install dependencies
+    # Step 3: Install dependencies including ESLint plugins
     - name: Install dependencies
-      run: npm ci
-      
-    # Step 4: Linting
+      run: |
+        npm ci
+        npm install eslint-plugin-alpine --save-dev
+    
+    # Step 4: Linting with stricter checks
     - name: Run linter
-      run: npm run lint
+      run: |
+        npm run lint:check
+        # Fail if there are any linting errors
+        if [ $? -ne 0 ]; then
+          echo "Linting failed! Fix errors before proceeding."
+          exit 1
+        fi
       
     # Step 5: Build production assets
     - name: Build production assets
       run: npm run build
       
-    # Step 6: Verify built assets
+    # Step 6: Enhanced verification of built assets
     - name: Verify built files
       run: |
-        [ -f dist/css/style.css ] || exit 1
-        [ -f dist/js/bundle.js ] || exit 1
-        echo "All production assets built successfully"
+        echo "Checking production assets..."
+        [ -f dist/css/style.css ] || { echo "style.css missing"; exit 1; }
+        [ -f dist/js/bundle.js ] || { echo "bundle.js missing"; exit 1; }
+        [ -d dist/icons ] || { echo "icons directory missing"; exit 1; }
+        echo "✅ All production assets built successfully"
       
     # Step 7: Upload build artifacts
     - name: Upload artifacts
@@ -54,7 +64,7 @@ jobs:
         retention-days: 5
         compression-level: 6
 
-    # Step 8: Slack notification (only for failures)
+    # Step 8: Enhanced Slack notification
     - name: Notify Slack on failure
       if: failure()
       uses: rtCamp/action-slack-notify@v2
@@ -63,8 +73,11 @@ jobs:
         SLACK_TITLE: 'Frontend Build Failed - ${{ github.ref_name }}'
         SLACK_MESSAGE: |
           *Repository*: ${{ github.repository }}
+          *Branch*: ${{ github.ref_name }}
           *Workflow*: ${{ github.workflow }}
-          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
+          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha[:7] }}>
           *Triggered by*: ${{ github.actor }}
+          *Failed Step*: ${{ failure() && steps.*.conclusion == 'failure' && steps.*.name || 'Unknown' }}
           *Logs*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         SLACK_COLOR: '#ff0000'
+        SLACK_FOOTER: 'Build failed at $(date -u)'

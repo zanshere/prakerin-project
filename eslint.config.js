@@ -1,13 +1,12 @@
 import js from '@eslint/js';
-import alpine from 'eslint-plugin-alpine';
 
 export default [
+  {
+    ignores: ['dist/**', 'node_modules/**'],
+  },
   js.configs.recommended,
   {
     files: ['**/*.js'],
-    plugins: {
-      alpine
-    },
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -20,12 +19,11 @@ export default [
       }
     },
     rules: {
-      'indent': ['error', 2],
-      'quotes': ['error', 'single', { 'avoidEscape': true }],
-      'semi': ['error', 'always'],
-      'no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
-      'no-console': 'warn',
-      'alpine/no-direct-mutation-state': 'error'
+      indent: ['error', 2],
+      quotes: ['error', 'single', { avoidEscape: true }],
+      semi: ['error', 'always'],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-console': 'warn'
     }
   }
 ];

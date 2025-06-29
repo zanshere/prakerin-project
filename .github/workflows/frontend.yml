@@ -30,41 +30,72 @@ jobs:
         npm ci
         npm install eslint-plugin-alpine --save-dev
     
-    # Step 4: Linting with stricter checks
+    # Step 4: Linting with proper error handling
     - name: Run linter
       run: |
-        npm run lint:check
-        # Fail if there are any linting errors
-        if [ $? -ne 0 ]; then
-          echo "Linting failed! Fix errors before proceeding."
+        echo "Starting ESLint validation..."
+        eslint_output=$(npm run lint:check 2>&1)
+        eslint_exit_code=$?
+        
+        if [ $eslint_exit_code -ne 0 ]; then
+          echo "::error::ESLint validation failed!"
+          echo "$eslint_output"
+          echo "::group::ESLint Error Details"
+          echo "$eslint_output"
+          echo "::endgroup::"
           exit 1
         fi
+        echo "✅ ESLint validation passed"
       
     # Step 5: Build production assets
     - name: Build production assets
       run: npm run build
       
-    # Step 6: Enhanced verification of built assets
+    # Step 6: Comprehensive asset verification
     - name: Verify built files
       run: |
-        echo "Checking production assets..."
-        [ -f dist/css/style.css ] || { echo "style.css missing"; exit 1; }
-        [ -f dist/js/bundle.js ] || { echo "bundle.js missing"; exit 1; }
-        [ -d dist/icons ] || { echo "icons directory missing"; exit 1; }
-        echo "✅ All production assets built successfully"
+        echo "🔍 Verifying production assets..."
+        required_files=(
+          "dist/css/style.css"
+          "dist/js/bundle.js"
+          "dist/icons/"
+        )
+        
+        all_valid=true
+        for file in "${required_files[@]}"; do
+          if [[ $file == *"/" ]]; then
+            # Directory check
+            if [ ! -d "${file}" ]; then
+              echo "::warning::Directory missing: ${file}"
+              all_valid=false
+            fi
+          else
+            # File check
+            if [ ! -f "${file}" ]; then
+              echo "::error::File missing: ${file}"
+              all_valid=false
+            fi
+          fi
+        done
+        
+        if [ "$all_valid" = false ]; then
+          echo "::error::Some production assets are missing"
+          exit 1
+        fi
+        echo "✅ All production assets verified"
       
     # Step 7: Upload build artifacts
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: frontend-assets-${{ github.run_id }}
+        name: frontend-assets-${{ github.run_number }}
         path: |
           dist/
           public/
         retention-days: 5
         compression-level: 6
 
-    # Step 8: Enhanced Slack notification
+    # Step 8: Robust Slack notification
     - name: Notify Slack on failure
       if: failure()
       uses: rtCamp/action-slack-notify@v2
@@ -72,11 +103,12 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_TITLE: 'Frontend Build Failed - ${{ github.ref_name }}'
         SLACK_MESSAGE: |
-          *Repository*: ${{ github.repository }}
-          *Branch*: ${{ github.ref_name }}
           *Workflow*: ${{ github.workflow }}
-          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
+          *Repository*: <https://github.com/${{ github.repository }}|${{ github.repository }}>
+          *Branch*: ${{ github.ref_name }}
+          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ format('{0:.7}', github.sha) }}>
           *Triggered by*: ${{ github.actor }}
-          *Logs*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        SLACK_COLOR: '#ff0000'
-        SLACK_FOOTER: 'Build failed at $(date -u)'
+          *Failed Step*: ${{ join(steps.*.outcome, ', ') }}
+          *Logs*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>
+        SLACK_COLOR: 'danger'
+        SLACK_FOOTER: 'Failed in run ${{ github.run_number }}'

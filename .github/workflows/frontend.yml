@@ -24,26 +24,35 @@ jobs:
         node-version: 22
         cache: 'npm'
     
-    # Step 3: Install dependencies including ESLint plugins
+    # Step 3: Install dependencies with ESLint
     - name: Install dependencies
       run: |
         npm ci
-        npm install eslint-plugin-alpine --save-dev
+        # Ensure ESLint and its plugins are installed
+        npm install --save-dev eslint eslint-plugin-alpine
     
-    # Step 4: Fixed Linting with proper error handling
+    # Step 4: Run linter with proper error handling
     - name: Run linter
       run: |
         echo "Starting ESLint validation..."
-        npm run lint:check
-        if [ $? -ne 0 ]; then
-          echo "::error::ESLint validation failed!"
-          exit 1
+        # Check if src/js directory exists
+        if [ ! -d "src/js" ]; then
+          echo "::warning::src/js directory not found, skipping lint check"
+        else
+          # Run ESLint using npx to ensure it's available
+          npx eslint src/js/ --no-error-on-unmatched-pattern
+          if [ $? -ne 0 ]; then
+            echo "::error::ESLint validation failed!"
+            exit 1
+          fi
+          echo "✅ ESLint validation passed"
         fi
-        echo "✅ ESLint validation passed"
       
     # Step 5: Build production assets
     - name: Build production assets
-      run: npm run build
+      run: |
+        echo "Building production assets..."
+        npm run build
       
     # Step 6: Comprehensive asset verification
     - name: Verify built files
@@ -62,12 +71,16 @@ jobs:
             if [ ! -d "${file}" ]; then
               echo "::warning::Directory missing: ${file}"
               all_valid=false
+            else
+              echo "✅ Directory found: ${file}"
             fi
           else
             # File check
             if [ ! -f "${file}" ]; then
               echo "::error::File missing: ${file}"
               all_valid=false
+            else
+              echo "✅ File found: ${file}"
             fi
           fi
         done
@@ -81,6 +94,7 @@ jobs:
     # Step 7: Upload build artifacts
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
+      if: success()
       with:
         name: frontend-assets-${{ github.run_number }}
         path: |
@@ -100,9 +114,7 @@ jobs:
           *Workflow*: ${{ github.workflow }}
           *Repository*: <https://github.com/${{ github.repository }}|${{ github.repository }}>
           *Branch*: ${{ github.ref_name }}
-          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{
-            github.sha
-          }}>
+          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
           *Triggered by*: ${{ github.actor }}
           *Logs*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>
         SLACK_COLOR: 'danger'

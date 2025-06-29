@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --watch",
     "prod": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --minify",
-    "build:icons": "node src/js/copy-icons.js"
+    "build:icons": "node src/js/copy-icons.js",
+    "build:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm",
+    "watch:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --watch"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +20,8 @@
     "bootstrap-icons": "^1.13.1",
     "daisyui": "^5.0.43",
     "sweetalert2": "^11.22.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5"
   }
 }

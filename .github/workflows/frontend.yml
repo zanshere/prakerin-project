@@ -30,19 +30,13 @@ jobs:
         npm ci
         npm install eslint-plugin-alpine --save-dev
     
-    # Step 4: Linting with proper error handling
+    # Step 4: Fixed Linting with proper error handling
     - name: Run linter
       run: |
         echo "Starting ESLint validation..."
-        eslint_output=$(npm run lint:check 2>&1)
-        eslint_exit_code=$?
-        
-        if [ $eslint_exit_code -ne 0 ]; then
+        npm run lint:check
+        if [ $? -ne 0 ]; then
           echo "::error::ESLint validation failed!"
-          echo "$eslint_output"
-          echo "::group::ESLint Error Details"
-          echo "$eslint_output"
-          echo "::endgroup::"
           exit 1
         fi
         echo "✅ ESLint validation passed"
@@ -95,7 +89,7 @@ jobs:
         retention-days: 5
         compression-level: 6
 
-    # Step 8: Robust Slack notification
+    # Step 8: Fixed Slack notification
     - name: Notify Slack on failure
       if: failure()
       uses: rtCamp/action-slack-notify@v2
@@ -106,9 +100,10 @@ jobs:
           *Workflow*: ${{ github.workflow }}
           *Repository*: <https://github.com/${{ github.repository }}|${{ github.repository }}>
           *Branch*: ${{ github.ref_name }}
-          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ format('{0:.7}', github.sha) }}>
+          *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{
+            github.sha
+          }}>
           *Triggered by*: ${{ github.actor }}
-          *Failed Step*: ${{ join(steps.*.outcome, ', ') }}
           *Logs*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>
         SLACK_COLOR: 'danger'
         SLACK_FOOTER: 'Failed in run ${{ github.run_number }}'

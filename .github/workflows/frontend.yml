@@ -19,7 +19,7 @@ jobs:
       
     # Langkah 2: Setup Node.js
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4  # Update ke v4
       with:
         node-version: 22
         cache: 'npm'
@@ -36,9 +36,9 @@ jobs:
     - name: Build production assets
       run: npm run build
       
-    # Langkah 6: Upload hasil build
+    # Langkah 6: Upload hasil build (Menggunakan v4)
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # Versi terbaru
       with:
         name: frontend-assets
         path: |

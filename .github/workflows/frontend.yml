@@ -13,50 +13,55 @@ jobs:
       NODE_ENV: production
     
     steps:
-    # Langkah 1: Checkout kode
+    # Step 1: Checkout code
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    # Langkah 2: Setup Node.js
+    # Step 2: Setup Node.js
     - name: Setup Node.js
-      uses: actions/setup-node@v4  # Update ke v4
+      uses: actions/setup-node@v4
       with:
         node-version: 22
         cache: 'npm'
     
-    # Langkah 3: Install dependencies
+    # Step 3: Install dependencies
     - name: Install dependencies
       run: npm ci
       
-    # Langkah 4: Linting
+    # Step 4: Linting
     - name: Run linter
       run: npm run lint
       
-    # Langkah 5: Build produksi
+    # New Step: Run tests
+    - name: Run tests
+      run: npm test
+      
+    # Step 5: Build production
     - name: Build production assets
       run: npm run build
       
-    # Langkah 6: Upload hasil build (Menggunakan v4)
+    # Step 6: Upload build artifacts
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4  # Versi terbaru
+      uses: actions/upload-artifact@v4
       with:
-        name: frontend-assets
+        name: frontend-assets-${{ github.run_id }}
         path: |
           dist/
           public/
         retention-days: 5
+        compression-level: 6  # Added compression
 
-    # Langkah 7: Notifikasi Slack (Opsional)
-    - name: Notify Slack
-      if: always()
+    # Step 7: Slack notification (only for failures)
+    - name: Notify Slack on failure
+      if: failure()
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_TITLE: 'Frontend Build - ${{ github.ref_name }}'
+        SLACK_TITLE: 'Frontend Build Failed - ${{ github.ref_name }}'
         SLACK_MESSAGE: |
           *Repository*: ${{ github.repository }}
-          *Status*: ${{ job.status }}
           *Workflow*: ${{ github.workflow }}
           *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
           *Triggered by*: ${{ github.actor }}
-        SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}
+          *Logs*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        SLACK_COLOR: '#ff0000'

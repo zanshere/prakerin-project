@@ -12,7 +12,9 @@ export default [
         document: 'readonly',
         window: 'readonly',
         Alpine: 'readonly',
-        Swal: 'readonly'
+        Swal: 'readonly',
+        module: 'readonly',
+        require: 'readonly'
       }
     },
     rules: {

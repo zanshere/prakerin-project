@@ -41,25 +41,44 @@ $profileImage = $isLoggedIn ?
     <script defer src="<?= base_url('dist/js/bundle.js') ?>"></script>
     <!-- Sweetalert2 -->
     <script src="<?= base_url('dist/js/sweetalert2.all.min.js') ?>"></script>
-
-
+    <style>
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: currentColor;
+            transition: transform 0.3s, opacity 0.3s;
+            margin: 5px 0;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+    </style>
 </head>
 
 <body class="min-h-screen">
     <!-- Navbar -->
     <div class="navbar bg-base-100 shadow-md fixed w-full z-50 px-4 lg:px-8">
         <div class="navbar-start">
-            <!-- Mobile menu button -->
-            <div class="dropdown lg:hidden">
-                <button @click="sidebarOpen = !sidebarOpen"
-                    class="btn btn-ghost btn-circle hover:bg-base-200 transition-colors duration-300">
-                    <div class="hamburger" :class="{ 'active': sidebarOpen }">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </button>
-            </div>
+            <!-- Mobile menu button - Hanya tampil jika user sudah login -->
+            <?php if ($isLoggedIn): ?>
+                <div class="dropdown lg:hidden">
+                    <button @click="sidebarOpen = !sidebarOpen"
+                        class="btn btn-ghost btn-circle hover:bg-base-200 transition-colors duration-300">
+                        <div class="hamburger" :class="{ 'active': sidebarOpen }">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </button>
+                </div>
+            <?php endif; ?>
 
             <!-- Logo -->
             <a href="<?= base_url() ?>" class="btn btn-ghost normal-case text-xl font-bold">
@@ -70,29 +89,31 @@ $profileImage = $isLoggedIn ?
             </a>
         </div>
 
-        <!-- Center Menu (Desktop) -->
-        <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal px-1 gap-2">
-                <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-house text-lg"></i>
-                        Home
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-info text-lg"></i>
-                        About
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-graph-up text-lg"></i>
-                        Stats
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <!-- Center Menu (Desktop) - Hanya tampil jika user sudah login -->
+        <?php if ($isLoggedIn): ?>
+            <div class="navbar-center hidden lg:flex">
+                <ul class="menu menu-horizontal px-1 gap-2">
+                    <li>
+                        <a href="#" class="btn btn-ghost btn-sm">
+                            <i class="bi bi-house text-lg"></i>
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-ghost btn-sm">
+                            <i class="bi bi-info text-lg"></i>
+                            About
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-ghost btn-sm">
+                            <i class="bi bi-graph-up text-lg"></i>
+                            Stats
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        <?php endif; ?>
 
         <div class="navbar-end gap-2">
             <!-- DaisyUI Theme Toggle -->
@@ -108,16 +129,14 @@ $profileImage = $isLoggedIn ?
             </label>
 
             <!-- User Section -->
-            <template x-if="!isLoggedIn">
-                <div class="hidden lg:flex gap-2">
+            <?php if (!$isLoggedIn): ?>
+                <div class="flex gap-2">
                     <a href="<?= base_url('auth/login.php') ?>" class="btn btn-ghost btn-sm">
                         <i class="bi bi-box-arrow-in-right"></i>
-                        Login
+                        <span class="hidden lg:inline">Login</span>
                     </a>
                 </div>
-            </template>
-
-            <template x-if="isLoggedIn">
+            <?php else: ?>
                 <div class="dropdown dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar"
                         @click="profileDropdownOpen = !profileDropdownOpen">
@@ -152,11 +171,12 @@ $profileImage = $isLoggedIn ?
                         </li>
                     </ul>
                 </div>
-            </template>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Enhanced Mobile Sidebar -->
+    <!-- Enhanced Mobile Sidebar - Hanya tampil jika user sudah login -->
+    <?php if ($isLoggedIn): ?>
     <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-40 lg:hidden">
@@ -211,62 +231,52 @@ $profileImage = $isLoggedIn ?
 
                 <!-- User Section -->
                 <div class="p-4">
-                    <template x-if="!isLoggedIn">
-                        <div class="space-y-3">
-                            <a href="<?= base_url('auth/login.php') ?>" class="btn btn-outline btn-block">
-                                <i class="bi bi-box-arrow-in-right mr-2"></i>
-                                Login
-                            </a>
-                        </div>
-                    </template>
-
-                    <template x-if="isLoggedIn">
-                        <div class="space-y-4">
-                            <!-- User Info Card -->
-                            <div class="card bg-base-200 border border-base-300">
-                                <div class="card-body p-4">
-                                    <div class="flex items-center">
-                                        <div class="avatar mr-3">
-                                            <div class="w-12 rounded-full">
-                                                <img src="<?= $profileImage ?>" alt="Profile" />
-                                            </div>
+                    <div class="space-y-4">
+                        <!-- User Info Card -->
+                        <div class="card bg-base-200 border border-base-300">
+                            <div class="card-body p-4">
+                                <div class="flex items-center">
+                                    <div class="avatar mr-3">
+                                        <div class="w-12 rounded-full">
+                                            <img src="<?= $profileImage ?>" alt="Profile" />
                                         </div>
-                                        <div>
-                                            <h3 class="font-bold text-base"><?= htmlspecialchars($username) ?></h3>
-                                            <p class="text-sm opacity-70">Active now</p>
-                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-base"><?= htmlspecialchars($username) ?></h3>
+                                        <p class="text-sm opacity-70">Active now</p>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- User Menu -->
-                            <ul class="menu bg-base-200 rounded-box">
-                                <li>
-                                    <a href="<?= base_url('pages/profile/profile.php') ?>">
-                                        <i class="bi bi-person text-primary"></i>
-                                        Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="<?= base_url('pages/profile/setting.php') ?>">
-                                        <i class="bi bi-gear text-secondary"></i>
-                                        Settings
-                                    </a>
-                                </li>
-                                <div class="divider my-1"></div>
-                                <li>
-                                    <a href="<?= base_url('auth/logout.php') ?>" class="text-error">
-                                        <i class="bi bi-box-arrow-right"></i>
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
-                    </template>
+
+                        <!-- User Menu -->
+                        <ul class="menu bg-base-200 rounded-box">
+                            <li>
+                                <a href="<?= base_url('pages/profile/profile.php') ?>">
+                                    <i class="bi bi-person text-primary"></i>
+                                    Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url('pages/profile/setting.php') ?>">
+                                    <i class="bi bi-gear text-secondary"></i>
+                                    Settings
+                                </a>
+                            </li>
+                            <div class="divider my-1"></div>
+                            <li>
+                                <a href="<?= base_url('auth/logout.php') ?>" class="text-error">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Setelah navbar dan sidebar mobile -->
     <div class="min-h-screen flex flex-col">

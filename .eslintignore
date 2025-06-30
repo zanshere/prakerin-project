@@ -1,4 +1,0 @@
-# Ignoring node_modules/
-node_modules/
-dist/
-*.min.js

@@ -75,7 +75,5 @@ showAlert('error', 'Gagal', '<?= addslashes($error) ?>');
 <?php endif; ?>
 </script>
 
-<?php 
-$_SESSION['force_light_footer'] = true;
-include __DIR__ . '/../includes/footer.php'; 
-?>
+</body>
+</html>

@@ -42,21 +42,23 @@ include __DIR__ . '/../includes/header.php';
                     <label class="label" for="password">
                         <span class="label-text">Password</span>
                     </label>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Enter your password"
-                            class="input input-bordered w-full pr-10" required>
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-3">
-                            <i class="bi bi-eye-slash" id="toggleIcon"></i>
-                        </button>
-                    </div>
+                    <input type="password" id="password" name="password" placeholder="Enter your password"
+                        class="input input-bordered w-full" required>
                 </div>
-
+                <!-- Teks untuk toggle password -->
+                <div class="flex items-center justify-start mt-2 gap-2">
+                    <button type="button" onclick="togglePassword()" class="label-text">
+                        <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                        <span id="toggleText" class="text-sm cursor-pointer">Show Password</span>
+                    </button>
+                </div>
                 <div class="flex items-center justify-between mt-2">
                     <label class="cursor-pointer label justify-start gap-2">
                         <input type="checkbox" name="remember" class="checkbox checkbox-sm">
                         <span class="label-text">Remember me</span>
                     </label>
-                    <a href="<?= base_url('auth/forgotPassword.php') ?>" class="text-sm link link-primary">Forgot password?</a>
+                    <a href="<?= base_url('auth/forgotPassword.php') ?>" class="text-sm link link-primary">Forgot
+                        password?</a>
                 </div>
 
                 <button type="submit" name="login" class="btn btn-primary w-full mt-6">Login</button>
@@ -66,7 +68,8 @@ include __DIR__ . '/../includes/header.php';
         <div class="divider my-6">OR</div>
 
         <div class="text-center">
-            <p class="text-sm text-base-content/70">Don't have an account? <a href="#" class="link link-primary">Contact admin</a></p>
+            <p class="text-sm text-base-content/70">Don't have an account? <a href="#" class="link link-primary">Contact
+                    admin</a></p>
         </div>
     </div>
 </div>
@@ -76,15 +79,17 @@ include __DIR__ . '/../includes/header.php';
 function togglePassword() {
     const passwordField = document.getElementById('password');
     const toggleIcon = document.getElementById('toggleIcon');
-
+    const toggleText = document.getElementById('toggleText');
     if (passwordField.type === 'password') {
         passwordField.type = 'text';
         toggleIcon.classList.remove('bi-eye-slash');
         toggleIcon.classList.add('bi-eye');
+        toggleText.textContent = 'Hide Password'; // Ubah teks menjadi 'Hide Password'
     } else {
         passwordField.type = 'password';
         toggleIcon.classList.remove('bi-eye');
         toggleIcon.classList.add('bi-eye-slash');
+        toggleText.textContent = 'Show Password'; // Ubah teks menjadi 'Show Password'
     }
 }
 
@@ -125,7 +130,5 @@ showAlert('error', 'Terjadi Kesalahan', '<?= addslashes($passwordError) ?>');
 <?php endif; ?>
 </script>
 
-<?php 
-$_SESSION['force_light_footer'] = true;
-include __DIR__ . '/../includes/footer.php'; 
-?>
+</body>
+</html>

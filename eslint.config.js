@@ -3,9 +3,9 @@ export default [
     ignores: ['dist/**', 'node_modules/**', '**/*.min.js'],
   },
   {
-    files: ['src/js/**/*.js'],
+    files: ['**/*.js'],
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
         console: 'readonly',
@@ -16,11 +16,19 @@ export default [
       }
     },
     rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'warn',
+      // Basic ESLint recommended rules
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-undef': 'error',
+      'no-redeclare': 'error',
+      'no-unreachable': 'error',
+      'no-constant-condition': 'warn',
+      'no-empty': 'warn',
+      
+      // Style rules
       'indent': ['error', 2],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always']
+      'quotes': ['error', 'single', { avoidEscape: true }],
+      'semi': ['error', 'always'],
+      'no-console': 'warn'
     }
   }
 ];

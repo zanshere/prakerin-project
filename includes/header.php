@@ -39,6 +39,8 @@ $profileImage = $isLoggedIn ?
     <link rel="stylesheet" href="<?= base_url('public/icons/bootstrap-icons.css') ?>">
     <!-- AlpineJS -->
     <script defer src="<?= base_url('dist/js/bundle.js') ?>"></script>
+    <!-- Sweetalert2 -->
+    <script src="<?= base_url('dist/js/sweetalert2.all.min.js') ?>"></script>
 
 
 </head>

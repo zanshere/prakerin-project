@@ -1,14 +1,11 @@
-import js from '@eslint/js';
-
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', '**/*.min.js'],
   },
-  js.configs.recommended,
   {
-    files: ['**/*.js'],
+    files: ['src/js/**/*.js'],
     languageOptions: {
-      ecmaVersion: 'latest',
+      ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
         console: 'readonly',
@@ -19,11 +16,11 @@ export default [
       }
     },
     rules: {
-      indent: ['error', 2],
-      quotes: ['error', 'single', { avoidEscape: true }],
-      semi: ['error', 'always'],
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      'no-console': 'warn'
+      'no-unused-vars': 'warn',
+      'no-console': 'warn',
+      'indent': ['error', 2],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always']
     }
   }
 ];

@@ -1,19 +1,26 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: [
-      "./*.php",
-      "./pages/**/*.{html, js, php}",
-      "./admin/**/*.{html, js, php}",
-      "./src/**/*.{html,js,php}",
-      "./dist/**/*.{html,js,php}"
-    ],
-    theme: {
-      extend: {},
-    },
-    plugins: [
-      require('daisyui'),
-    ],
-    daisyui: {
-      themes: ["light", "dark"],
-    },
-  }
+  // Daftar file yang akan di-scan oleh Tailwind
+  content: [
+    './*.php',
+    './pages/**/*.{html,js,php}',
+    './admin/**/*.{html,js,php}',
+    './src/**/*.{html,js,php}',
+    './dist/**/*.{html,js,php}'
+  ],
+
+  // Konfigurasi tema (bisa dikustomisasi)
+  theme: {
+    extend: {}, // Ekstensi tema default (opsional)
+  },
+
+  // Plugin Tailwind yang digunakan
+  plugins: [
+    require('daisyui'), // Plugin DaisyUI
+  ],
+
+  // Konfigurasi khusus DaisyUI
+  daisyui: {
+    themes: ['light', 'dark'], // Daftar tema yang digunakan
+  },
+};

@@ -21,6 +21,7 @@ include __DIR__ . '/../includes/header.php';
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-md overflow-hidden p-8">
             <div class="text-center mb-8">
+            <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-16 mx-auto mb-4">
                 <h1 class="text-2xl font-bold text-base-content">Reset Your Password</h1>
                 <p class="text-sm text-base-content mt-2">Enter your email to receive a reset link</p>
             </div>
@@ -48,8 +49,33 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </main>
 
+<script>
+// Fungsi untuk menampilkan notifikasi
+function showAlert(icon, title, text) {
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const isDark = theme === 'dark';
+
+    Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        confirmButtonColor: '#3b82f6',
+        background: isDark ? '#1f2937' : '#ffffff',
+        color: isDark ? '#ffffff' : '#1f2937'
+    });
+}
+
+// Handle notifikasi
+<?php if ($message): ?>
+showAlert('success', 'Berhasil', '<?= addslashes($message) ?>');
+<?php endif; ?>
+
+<?php if ($error): ?>
+showAlert('error', 'Gagal', '<?= addslashes($error) ?>');
+<?php endif; ?>
+</script>
+
 <?php 
-// Gunakan footer light theme
 $_SESSION['force_light_footer'] = true;
 include __DIR__ . '/../includes/footer.php'; 
 ?>

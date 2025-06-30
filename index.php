@@ -1,10 +1,7 @@
-<?php 
-// Header
-include __DIR__ . '/includes/header.php';
+<?php
+include_once __DIR__ . '/config/baseURL.php';
+
+header("Location: " . base_url('auth/login.php'));
+exit;
 
 ?>
-
-<!-- Content -->
-
-<!-- Footer -->
-<?php include __DIR__ . '/includes/footer.php'; ?>

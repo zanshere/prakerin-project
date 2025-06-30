@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.0",
-    "esbuild": "^0.25.5",
+    "esbuild": "0.25.5",
     "eslint": "^9.15.0"
   }
 }

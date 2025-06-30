@@ -11,8 +11,8 @@
     "build:css": "tailwindcss -i ./src/css/input.css -o ./dist/css/style.css --minify",
     "build:js": "esbuild src/js/app.js --bundle --outfile=dist/js/bundle.js --format=esm --minify",
     "build:icons": "node src/js/copy-icons.js",
-    "lint": "./node_modules/.bin/eslint src/js/ --fix",
-    "lint:check": "./node_modules/.bin/eslint src/js/ --no-error-on-unmatched-pattern"
+    "lint": "npx eslint src/js/ --fix",
+    "lint:check": "npx eslint src/js/ --no-error-on-unmatched-pattern"
   },
   "keywords": [],
   "author": "",

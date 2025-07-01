@@ -7,8 +7,8 @@ require_once __DIR__ . '/../functions/checkRememberMe.php';
 $isLoggedIn = isset($_SESSION['user_id']);
 $username = $isLoggedIn ? $_SESSION['username'] : 'Username';
 $profileImage = $isLoggedIn ? 
-    (isset($_SESSION['profile_image']) ? base_url('public/uploads/profiles/' . $_SESSION['profile_image']) : 'https://via.placeholder.com/40') 
-    : 'https://via.placeholder.com/40';
+    (isset($_SESSION['profile_image']) ? base_url('public/uploads/profiles/' . $_SESSION['profile_image']) : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg') 
+    : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg';
 ?>
 
 <!DOCTYPE html>
@@ -247,29 +247,6 @@ $profileImage = $isLoggedIn ?
                                 </div>
                             </div>
                         </div>
-
-                        <!-- User Menu -->
-                        <ul class="menu bg-base-200 rounded-box">
-                            <li>
-                                <a href="<?= base_url('pages/profile/profile.php') ?>">
-                                    <i class="bi bi-person text-primary"></i>
-                                    Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a href="<?= base_url('pages/profile/setting.php') ?>">
-                                    <i class="bi bi-gear text-secondary"></i>
-                                    Settings
-                                </a>
-                            </li>
-                            <div class="divider my-1"></div>
-                            <li>
-                                <a href="<?= base_url('auth/logout.php') ?>" class="text-error">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    Logout
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>

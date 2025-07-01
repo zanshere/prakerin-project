@@ -12,4 +12,8 @@ function base_url($path = '') {
 function asset_url($path = '') {
     return base_url('assets/' . ltrim($path, '/'));
 }
+
+function dist_url($path = '') {
+    return base_url('assets/' . ltrim($path, '/'));
+}
 ?>

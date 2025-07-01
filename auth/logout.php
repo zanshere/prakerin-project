@@ -1,6 +1,11 @@
 <?php
-session_start();
 require_once __DIR__ . '/../config/connect.php';
+include __DIR__ . '/../config/baseURL.php';
+
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Hapus remember me token
 if (isset($_COOKIE['remember_token'])) {
@@ -17,6 +22,11 @@ if (isset($_COOKIE['remember_token'])) {
 $_SESSION = array();
 session_destroy();
 
-header("Location: " . base_url() . "?remember_login=true");
+// Set session baru untuk menampilkan alert
+session_start();
+$_SESSION['logout_success'] = 'Anda telah berhasil logout.';
+$_SESSION['redirect_url'] = base_url('auth/login.php');
+
+header("Location: " . base_url());
 exit();
 ?>

@@ -1,18 +1,30 @@
 <?php
-include __DIR__ . '/../config/connect.php';
+require_once __DIR__ . '/../config/connect.php';
+include_once __DIR__ . '/../config/baseURL.php';
+
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Check for login success/error messages
 $loginError = $_SESSION['login_error'] ?? '';
 $loginSuccess = $_SESSION['login_success'] ?? '';
 $passwordMessage = $_SESSION['password_message'] ?? '';
 $passwordError = $_SESSION['password_error'] ?? '';
-unset($_SESSION['login_error'], $_SESSION['login_success'], $_SESSION['password_message'], $_SESSION['password_error']);
+$redirectUrl = $_SESSION['redirect_url'] ?? base_url();
 
-// Redirect if already logged in
-if (isset($_SESSION['user_id'])) {
-    header("Location: " . base_url());
-    exit();
-}
+// Clear session messages after assigning to variables
+unset(
+    $_SESSION['login_error'], 
+    $_SESSION['login_success'], 
+    $_SESSION['password_message'], 
+    $_SESSION['password_error'],
+    $_SESSION['redirect_url']
+);
+
+$logoutSuccess = $_SESSION['logout_success'] ?? '';
+unset($_SESSION['logout_success']);
 
 // Force light theme for this page
 $_SESSION['force_light_theme'] = true;
@@ -22,12 +34,12 @@ include __DIR__ . '/../includes/header.php';
 <div class="container mx-auto px-4 py-12">
     <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-md overflow-hidden p-8">
         <div class="text-center mb-8">
-            <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-16 mx-auto mb-4">
+            <img src="<?= asset_url('images/bareskrim-logo.png') ?>" alt="Logo" class="h-16 mx-auto mb-4">
             <h1 class="text-2xl font-bold text-base-content">Login to Your Account</h1>
             <p class="text-sm text-base-content/70">Enter your credentials to access the system</p>
         </div>
 
-        <form id="loginForm" method="POST" action="<?= base_url('auth/userLogin.php') ?>">
+        <form id="loginForm" method="POST" action="<?= base_url('functions/userLogin.php') ?>">
             <div class="space-y-4">
                 <div class="form-control">
                     <label class="label" for="username">
@@ -104,7 +116,9 @@ function showAlert(icon, title, text, redirectUrl = null) {
         text: text,
         confirmButtonColor: '#3b82f6',
         background: isDark ? '#1f2937' : '#ffffff',
-        color: isDark ? '#ffffff' : '#1f2937'
+        color: isDark ? '#ffffff' : '#1f2937',
+        allowOutsideClick: false,
+        allowEscapeKey: false
     }).then((result) => {
         if (redirectUrl && result.isConfirmed) {
             window.location.href = redirectUrl;
@@ -113,21 +127,27 @@ function showAlert(icon, title, text, redirectUrl = null) {
 }
 
 // Handle notifikasi
-<?php if ($loginError): ?>
-showAlert('error', 'Login Gagal', '<?= addslashes($loginError) ?>');
-<?php endif; ?>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($loginError): ?>
+    showAlert('error', 'Login Gagal', '<?= addslashes($loginError) ?>');
+    <?php endif; ?>
 
-<?php if ($loginSuccess): ?>
-showAlert('success', 'Login Berhasil', '<?= addslashes($loginSuccess) ?>', '<?= base_url() ?>');
-<?php endif; ?>
+    <?php if ($loginSuccess): ?>
+    showAlert('success', 'Login Berhasil', '<?= addslashes($loginSuccess) ?>', '<?= $redirectUrl ?>');
+    <?php endif; ?>
 
-<?php if ($passwordMessage): ?>
-showAlert('info', 'Informasi', '<?= addslashes($passwordMessage) ?>');
-<?php endif; ?>
+    <?php if ($passwordMessage): ?>
+    showAlert('info', 'Informasi', '<?= addslashes($passwordMessage) ?>');
+    <?php endif; ?>
 
-<?php if ($passwordError): ?>
-showAlert('error', 'Terjadi Kesalahan', '<?= addslashes($passwordError) ?>');
-<?php endif; ?>
+    <?php if ($passwordError): ?>
+    showAlert('error', 'Terjadi Kesalahan', '<?= addslashes($passwordError) ?>');
+    <?php endif; ?>
+
+    <?php if ($logoutSuccess): ?>
+    showAlert('success', 'Logout Berhasil', '<?= addslashes($logoutSuccess) ?>', '<?= $redirectUrl ?>');
+    <?php endif; ?>
+});
 </script>
 
 </body>

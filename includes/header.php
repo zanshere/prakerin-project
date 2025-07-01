@@ -1,6 +1,6 @@
 <?php 
 require_once __DIR__ . '/../config/connect.php';
-include __DIR__ . '/../config/baseURL.php';
+include_once __DIR__ . '/../config/baseURL.php';
 require_once __DIR__ . '/../functions/checkRememberMe.php';
 
 // Check if user is logged in
@@ -32,33 +32,36 @@ $profileImage = $isLoggedIn ?
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prakerin Project</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" href="<?= base_url('assets/images/bareskrim-logo.png') ?>" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= asset_url('images/bareskrim-logo.png') ?>" type="image/x-icon">
     <!-- DaisyUI + Tailwind CSS -->
     <link rel="stylesheet" href="<?= base_url('dist/css/style.css') ?>">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="<?= base_url('public/icons/bootstrap-icons.css') ?>">
     <!-- AlpineJS -->
-    <script defer src="<?= base_url('dist/js/bundle.js') ?>"></script>
+    <script defer src="<?= dist_url('js/bundle.js') ?>"></script>
     <!-- Sweetalert2 -->
-    <script src="<?= base_url('dist/js/sweetalert2.all.min.js') ?>"></script>
+    <script src="<?= dist_url('js/sweetalert2.all.min.js') ?>"></script>
     <style>
-        .hamburger span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background-color: currentColor;
-            transition: transform 0.3s, opacity 0.3s;
-            margin: 5px 0;
-        }
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-        }
+    .hamburger span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background-color: currentColor;
+        transition: transform 0.3s, opacity 0.3s;
+        margin: 5px 0;
+    }
+
+    .hamburger.active span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
     </style>
 </head>
 
@@ -68,21 +71,21 @@ $profileImage = $isLoggedIn ?
         <div class="navbar-start">
             <!-- Mobile menu button - Hanya tampil jika user sudah login -->
             <?php if ($isLoggedIn): ?>
-                <div class="dropdown lg:hidden">
-                    <button @click="sidebarOpen = !sidebarOpen"
-                        class="btn btn-ghost btn-circle hover:bg-base-200 transition-colors duration-300">
-                        <div class="hamburger" :class="{ 'active': sidebarOpen }">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </button>
-                </div>
+            <div class="dropdown lg:hidden">
+                <button @click="sidebarOpen = !sidebarOpen"
+                    class="btn btn-ghost btn-circle hover:bg-base-200 transition-colors duration-300">
+                    <div class="hamburger" :class="{ 'active': sidebarOpen }">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+            </div>
             <?php endif; ?>
 
             <!-- Logo -->
             <a href="<?= base_url() ?>" class="btn btn-ghost normal-case text-xl font-bold">
-                <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-8 w-auto mr-2">
+                <img src="<?= asset_url('images/bareskrim-logo.png') ?>" alt="Logo" class="h-8 w-auto mr-2">
                 <span class="hidden sm:inline text-base-content">
                     Unit Reskrim
                 </span>
@@ -91,28 +94,28 @@ $profileImage = $isLoggedIn ?
 
         <!-- Center Menu (Desktop) - Hanya tampil jika user sudah login -->
         <?php if ($isLoggedIn): ?>
-            <div class="navbar-center hidden lg:flex">
-                <ul class="menu menu-horizontal px-1 gap-2">
-                    <li>
-                        <a href="#" class="btn btn-ghost btn-sm">
-                            <i class="bi bi-house text-lg"></i>
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="btn btn-ghost btn-sm">
-                            <i class="bi bi-info text-lg"></i>
-                            About
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="btn btn-ghost btn-sm">
-                            <i class="bi bi-graph-up text-lg"></i>
-                            Stats
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1 gap-2">
+                <li>
+                    <a href="#" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-house text-lg"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-info text-lg"></i>
+                        About
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-graph-up text-lg"></i>
+                        Stats
+                    </a>
+                </li>
+            </ul>
+        </div>
         <?php endif; ?>
 
         <div class="navbar-end gap-2">
@@ -130,47 +133,43 @@ $profileImage = $isLoggedIn ?
 
             <!-- User Section -->
             <?php if (!$isLoggedIn): ?>
-                <div class="flex gap-2">
-                    <a href="<?= base_url('auth/login.php') ?>" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span class="hidden lg:inline">Login</span>
-                    </a>
-                </div>
+            <div class="flex gap-2">
+                <a href="<?= base_url('auth/login.php') ?>" class="btn btn-ghost btn-sm">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span class="hidden lg:inline">Login</span>
+                </a>
+            </div>
             <?php else: ?>
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar"
-                        @click="profileDropdownOpen = !profileDropdownOpen">
-                        <div class="w-10 rounded-full">
-                            <img src="<?= $profileImage ?>" alt="Profile" />
-                        </div>
+            <!-- Profile Dropdown for Desktop -->
+            <div class="dropdown dropdown-end" x-data="{ open: false }">
+                <button @click="open = !open" @click.outside="open = false" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img src="<?= $profileImage ?>" alt="Profile" />
                     </div>
-                    <ul x-show="profileDropdownOpen" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                        @click.away="profileDropdownOpen = false" tabindex="0"
-                        class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-300">
-                        <li class="menu-title">
-                            <span class="font-semibold"><?= htmlspecialchars($username) ?></span>
-                        </li>
-                        <li>
-                            <a href="<?= base_url('pages/profile/profile.php') ?>" class="justify-between">
-                                <span><i class="bi bi-person mr-2"></i>Profile</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= base_url('pages/profile/setting.php') ?>">
-                                <i class="bi bi-gear mr-2"></i>Settings
-                            </a>
-                        </li>
-                        <div class="divider my-1"></div>
-                        <li>
-                            <a href="<?= base_url('auth/logout.php') ?>" class="text-error">
-                                <i class="bi bi-box-arrow-right mr-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
+                </button>
+                <div x-show="open" x-transition
+                    class="absolute right-0 mt-2 w-56 origin-top-right rounded-md shadow-lg bg-base-100 text-base-content ring-1 ring-base-300 focus:outline-none z-50">
+                    <div class="py-1" role="none">
+                        <div class="px-4 py-2 border-b border-base-300">
+                            <p class="text-sm font-semibold"><?= htmlspecialchars($username) ?></p>
+                            <p class="text-xs text-base-content/70">Active now</p>
+                        </div>
+                        <a href="<?= base_url('pages/profile/profile.php') ?>"
+                            class="block px-4 py-2 text-sm hover:bg-base-200">
+                            <i class="bi bi-person mr-2"></i> Profile
+                        </a>
+                        <a href="<?= base_url('pages/profile/setting.php') ?>"
+                            class="block px-4 py-2 text-sm hover:bg-base-200">
+                            <i class="bi bi-gear mr-2"></i> Settings
+                        </a>
+                        <div class="border-t border-base-300"></div>
+                        <a href="<?= base_url('auth/logout.php') ?>"
+                            class="block px-4 py-2 text-sm text-error hover:bg-base-200">
+                            <i class="bi bi-box-arrow-right mr-2"></i> Logout
+                        </a>
+                    </div>
                 </div>
+            </div>
             <?php endif; ?>
         </div>
     </div>
@@ -193,7 +192,7 @@ $profileImage = $isLoggedIn ?
             <!-- Sidebar Header -->
             <div class="flex items-center justify-between p-4 border-b border-base-300">
                 <div class="flex items-center">
-                    <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-8 w-auto mr-3">
+                    <img src="<?= asset_url('images/bareskrim-logo.png') ?>" alt="Logo" class="h-8 w-auto mr-3">
                     <span class="text-xl font-bold">
                         Unit Reskrim
                     </span>
@@ -284,3 +283,37 @@ $profileImage = $isLoggedIn ?
         <main class="flex-grow pt-20">
             <div class="container mx-auto px-4 py-8">
                 <!-- Content dari halaman yang meng-include header akan muncul di sini -->
+
+                <script>
+                // Fungsi untuk konfirmasi logout
+                function confirmLogout(event) {
+                    event.preventDefault();
+                    const logoutUrl = event.currentTarget.getAttribute('href');
+                    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+                    const isDark = theme === 'dark';
+
+                    Swal.fire({
+                        title: 'Konfirmasi Logout',
+                        text: 'Apakah Anda yakin ingin logout?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3b82f6',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Logout',
+                        cancelButtonText: 'Batal',
+                        background: isDark ? '#1f2937' : '#ffffff',
+                        color: isDark ? '#ffffff' : '#1f2937',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = logoutUrl;
+                        }
+                    });
+                }
+
+                // Tambahkan event listener untuk semua link logout
+                document.querySelectorAll('a[href*="logout.php"]').forEach(link => {
+                    link.addEventListener('click', confirmLogout);
+                });
+                </script>

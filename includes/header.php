@@ -117,6 +117,12 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
                         Reports
                     </a>
                 </li>
+                <li>
+                    <a href="<?= base_url('admin/request.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-stack text-lg"></i>
+                        Request
+                    </a>
+                </li>
                 <?php else: ?>
                 <!-- Menu untuk user biasa -->
                 <li>
@@ -170,7 +176,7 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
                     <div class="py-1" role="none">
                         <div class="px-4 py-2 border-b border-base-300">
                             <p class="text-sm font-semibold"><?= htmlspecialchars($username) ?></p>
-                            <p class="text-xs text-base-content/70">Role: <?= ucfirst($userRole) ?></p>
+                            <p class="text-xs text-base-content/70"><?= ucfirst($userRole) ?> Reskrim</p>
                         </div>
                         <a href="<?= base_url('pages/profile/profile.php') ?>"
                             class="block px-4 py-2 text-sm hover:bg-base-200">
@@ -275,7 +281,7 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
 
                     <!-- Menu yang bisa diakses semua role -->
                     <li>
-                        <a href="<?= base_url('pages/settings.php') ?>" class="flex items-center">
+                        <a href="<?= base_url('pages/profile/setting.php') ?>" class="flex items-center">
                             <i class="bi bi-gear text-xl text-secondary mr-3"></i>
                             <span class="font-medium">Settings</span>
                         </a>

@@ -7,6 +7,15 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Check for session recovery from browser close
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['session_recovery'])) {
+    $recoveryData = json_decode($_COOKIE['session_recovery'], true);
+    
+    if (is_array($recoveryData) && isset($recoveryData['url'])) {
+        $_SESSION['intended_url'] = $recoveryData['url'];
+    }
+}
+
 // PENTING: Check remember me HANYA jika user belum login
 if (!isset($_SESSION['user_id'])) {
     // Check remember me functionality
@@ -83,6 +92,24 @@ function getCurrentUser($conn) {
     return $user;
 }
 
+// Function untuk update session recovery
+function updateSessionRecovery() {
+    if (isLoggedIn() && isset($_SERVER['REQUEST_URI'])) {
+        $recoveryData = [
+            'url' => $_SERVER['REQUEST_URI'],
+            'timestamp' => time()
+        ];
+        
+        setcookie('session_recovery', 
+                 json_encode($recoveryData), 
+                 time() + (30 * 24 * 60 * 60), // 30 days
+                 '/', 
+                 '', 
+                 isset($_SERVER['HTTPS']), 
+                 true);
+    }
+}
+
 // Function untuk logout
 function logout() {
     // Hapus remember token jika ada
@@ -107,6 +134,9 @@ function logout() {
         setcookie('remember_token', '', time() - 3600, '/');
     }
     
+    // Hapus session recovery cookie
+    setcookie('session_recovery', '', time() - 3600, '/');
+    
     // Hapus session
     session_unset();
     session_destroy();
@@ -123,4 +153,3 @@ function logout() {
     }
     exit();
 }
-?>

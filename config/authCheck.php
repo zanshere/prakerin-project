@@ -1,5 +1,5 @@
 <?php
-// File: config/auth_check.php
+// File: config/authCheck.php
 // Include file ini di setiap halaman yang memerlukan autentikasi
 
 // Start session if not already started
@@ -7,12 +7,25 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check remember me functionality
-require_once __DIR__ . '/../functions/checkRememberMe.php';
+// PENTING: Check remember me HANYA jika user belum login
+if (!isset($_SESSION['user_id'])) {
+    // Check remember me functionality
+    require_once __DIR__ . '/../functions/checkRememberMe.php';
+}
 
 // Function to check if user is logged in
 function isLoggedIn() {
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+}
+
+// Function to check user role
+function getUserRole() {
+    return $_SESSION['role'] ?? null;
+}
+
+// Function to check if user is admin
+function isAdmin() {
+    return getUserRole() === 'admin';
 }
 
 // Function to require login (redirect to login if not logged in)
@@ -35,13 +48,28 @@ function requireLogin($redirectUrl = null) {
     }
 }
 
+// Function to require admin access
+function requireAdmin() {
+    requireLogin(); // Ensure user is logged in first
+    
+    if (!isAdmin()) {
+        // Non-admin users get redirected to their dashboard
+        if (function_exists('base_url')) {
+            header("Location: " . base_url('pages/index.php'));
+        } else {
+            header("Location: /pages/index.php");
+        }
+        exit();
+    }
+}
+
 // Function to get current user info
 function getCurrentUser($conn) {
     if (!isLoggedIn()) {
         return null;
     }
     
-    $stmt = $conn->prepare("SELECT id_user, username, email, full_name, phone, nrp, `rank` FROM users WHERE id_user = ?");
+    $stmt = $conn->prepare("SELECT id_user, username, email, full_name, phone, nrp, `rank`, role FROM users WHERE id_user = ?");
     if (!$stmt) {
         return null;
     }

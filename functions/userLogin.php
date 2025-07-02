@@ -88,6 +88,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 ? base_url('admin/dashboard.php') 
                 : base_url('pages/index.php');
             
+            // Set session recovery cookie
+            $recoveryData = [
+                'url' => $redirectUrl,
+                'timestamp' => time()
+            ];
+
+            setcookie('session_recovery', 
+                    json_encode($recoveryData), 
+                    time() + (30 * 24 * 60 * 60), // 30 days
+                    '/', 
+                    '', 
+                    isset($_SERVER['HTTPS']), 
+                    true);
+            
             // Simpan redirect_url di session
             $_SESSION['redirect_url'] = $redirectUrl;
             

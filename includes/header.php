@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__ . '/../config/connect.php';
 include_once __DIR__ . '/../config/baseURL.php';
-require_once __DIR__ . '/../functions/checkRememberMe.php';
+require_once __DIR__ . '/../config/authCheck.php';
 
 // Check if user is logged in
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -9,6 +9,7 @@ $username = $isLoggedIn ? $_SESSION['username'] : 'Username';
 $profileImage = $isLoggedIn ? 
     (isset($_SESSION['profile_image']) ? base_url('public/uploads/profiles/' . $_SESSION['profile_image']) : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg') 
     : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg';
+$userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
 ?>
 
 <!DOCTYPE html>
@@ -96,24 +97,41 @@ $profileImage = $isLoggedIn ?
         <?php if ($isLoggedIn): ?>
         <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1 gap-2">
+                <?php if ($userRole === 'admin'): ?>
+                <!-- Menu khusus admin -->
                 <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-house text-lg"></i>
-                        Home
+                    <a href="<?= base_url('admin/dashboard.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-speedometer2 text-lg"></i>
+                        Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-info text-lg"></i>
-                        About
+                    <a href="<?= base_url('admin/manageUsers.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-people text-lg"></i>
+                        Manage Users
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-graph-up text-lg"></i>
-                        Stats
+                    <a href="<?= base_url('admin/reports.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-file-earmark-text text-lg"></i>
+                        Reports
                     </a>
                 </li>
+                <?php else: ?>
+                <!-- Menu untuk user biasa -->
+                <li>
+                    <a href="<?= base_url('pages/user/dashboard.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-person text-lg"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('pages/user/cases.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-folder text-lg"></i>
+                        My Cases
+                    </a>
+                </li>
+                <?php endif; ?>
             </ul>
         </div>
         <?php endif; ?>
@@ -152,7 +170,7 @@ $profileImage = $isLoggedIn ?
                     <div class="py-1" role="none">
                         <div class="px-4 py-2 border-b border-base-300">
                             <p class="text-sm font-semibold"><?= htmlspecialchars($username) ?></p>
-                            <p class="text-xs text-base-content/70">Active now</p>
+                            <p class="text-xs text-base-content/70">Role: <?= ucfirst($userRole) ?></p>
                         </div>
                         <a href="<?= base_url('pages/profile/profile.php') ?>"
                             class="block px-4 py-2 text-sm hover:bg-base-200">
@@ -162,6 +180,12 @@ $profileImage = $isLoggedIn ?
                             class="block px-4 py-2 text-sm hover:bg-base-200">
                             <i class="bi bi-gear mr-2"></i> Settings
                         </a>
+                        <?php if ($userRole === 'admin'): ?>
+                        <a href="<?= base_url('pages/admin/settings.php') ?>"
+                            class="block px-4 py-2 text-sm hover:bg-base-200">
+                            <i class="bi bi-shield-lock mr-2"></i> Admin Panel
+                        </a>
+                        <?php endif; ?>
                         <div class="border-t border-base-300"></div>
                         <a href="<?= base_url('auth/logout.php') ?>"
                             class="block px-4 py-2 text-sm text-error hover:bg-base-200">
@@ -207,21 +231,53 @@ $profileImage = $isLoggedIn ?
                 <!-- Menu Items -->
                 <ul class="menu p-4 gap-2">
                     <li>
-                        <a href="#" class="flex items-center">
+                        <a href="<?= base_url() ?>" class="flex items-center">
                             <i class="bi bi-home text-xl text-primary mr-3"></i>
                             <span class="font-medium">Home</span>
                         </a>
                     </li>
+
+                    <?php if ($userRole === 'admin'): ?>
+                    <!-- Menu khusus admin -->
                     <li>
-                        <a href="#" class="flex items-center">
-                            <i class="bi bi-info text-xl text-success mr-3"></i>
-                            <span class="font-medium">About</span>
+                        <a href="<?= base_url('pages/admin/dashboard.php') ?>" class="flex items-center">
+                            <i class="bi bi-speedometer2 text-xl text-info mr-3"></i>
+                            <span class="font-medium">Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
-                            <i class="bi bi-graph-up text-xl text-secondary mr-3"></i>
-                            <span class="font-medium">Stats</span>
+                        <a href="<?= base_url('pages/admin/users.php') ?>" class="flex items-center">
+                            <i class="bi bi-people text-xl text-warning mr-3"></i>
+                            <span class="font-medium">Manage Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= base_url('pages/admin/reports.php') ?>" class="flex items-center">
+                            <i class="bi bi-file-earmark-text text-xl text-success mr-3"></i>
+                            <span class="font-medium">Reports</span>
+                        </a>
+                    </li>
+                    <?php else: ?>
+                    <!-- Menu untuk user biasa -->
+                    <li>
+                        <a href="<?= base_url('pages/user/dashboard.php') ?>" class="flex items-center">
+                            <i class="bi bi-person text-xl text-success mr-3"></i>
+                            <span class="font-medium">My Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= base_url('pages/user/cases.php') ?>" class="flex items-center">
+                            <i class="bi bi-folder text-xl text-accent mr-3"></i>
+                            <span class="font-medium">My Cases</span>
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <!-- Menu yang bisa diakses semua role -->
+                    <li>
+                        <a href="<?= base_url('pages/settings.php') ?>" class="flex items-center">
+                            <i class="bi bi-gear text-xl text-secondary mr-3"></i>
+                            <span class="font-medium">Settings</span>
                         </a>
                     </li>
                 </ul>
@@ -242,7 +298,7 @@ $profileImage = $isLoggedIn ?
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-base"><?= htmlspecialchars($username) ?></h3>
-                                        <p class="text-sm opacity-70">Active now</p>
+                                        <p class="text-sm opacity-70">Role: <?= ucfirst($userRole) ?></p>
                                     </div>
                                 </div>
                             </div>

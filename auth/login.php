@@ -12,7 +12,7 @@ $loginError = $_SESSION['login_error'] ?? '';
 $loginSuccess = $_SESSION['login_success'] ?? '';
 $passwordMessage = $_SESSION['password_message'] ?? '';
 $passwordError = $_SESSION['password_error'] ?? '';
-$redirectUrl = $_SESSION['redirect_url'] ?? base_url();
+$redirectUrl = $_SESSION['redirect_url'] ?? ($_SESSION['intended_url'] ?? base_url());
 
 // Clear session messages after assigning to variables
 unset(
@@ -20,7 +20,8 @@ unset(
     $_SESSION['login_success'], 
     $_SESSION['password_message'], 
     $_SESSION['password_error'],
-    $_SESSION['redirect_url']
+    $_SESSION['redirect_url'],
+    $_SESSION['intended_url']
 );
 
 $logoutSuccess = $_SESSION['logout_success'] ?? '';
@@ -96,12 +97,12 @@ function togglePassword() {
         passwordField.type = 'text';
         toggleIcon.classList.remove('bi-eye-slash');
         toggleIcon.classList.add('bi-eye');
-        toggleText.textContent = 'Hide Password'; // Ubah teks menjadi 'Hide Password'
+        toggleText.textContent = 'Hide Password';
     } else {
         passwordField.type = 'password';
         toggleIcon.classList.remove('bi-eye');
         toggleIcon.classList.add('bi-eye-slash');
-        toggleText.textContent = 'Show Password'; // Ubah teks menjadi 'Show Password'
+        toggleText.textContent = 'Show Password';
     }
 }
 
@@ -147,6 +148,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php if ($logoutSuccess): ?>
     showAlert('success', 'Logout Berhasil', '<?= addslashes($logoutSuccess) ?>', '<?= $redirectUrl ?>');
     <?php endif; ?>
+});
+
+// Deteksi penutupan tab/browser
+window.addEventListener('beforeunload', function(e) {
+    // Hanya trigger jika user benar-benar menutup tab/browser
+    if (!e.target.activeElement || 
+        !['A', 'BUTTON', 'INPUT', 'FORM'].includes(e.target.activeElement.tagName)) {
+        
+        // Kirim ping ke server untuk memastikan session tetap aktif
+        navigator.sendBeacon('<?= base_url('functions/keepAlive.php') ?>');
+    }
 });
 </script>
 

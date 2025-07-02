@@ -34,7 +34,7 @@ $profileImage = $isLoggedIn ?
     <!-- Favicon -->
     <link rel="shortcut icon" href="<?= asset_url('images/bareskrim-logo.png') ?>" type="image/x-icon">
     <!-- DaisyUI + Tailwind CSS -->
-    <link rel="stylesheet" href="<?= base_url('dist/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= dist_url('css/style.css') ?>">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="<?= base_url('public/icons/bootstrap-icons.css') ?>">
     <!-- AlpineJS -->

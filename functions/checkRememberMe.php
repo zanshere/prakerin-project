@@ -44,8 +44,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
         if (password_verify($token, $row['token_hash'])) {
             $tokenFound = true;
             
-            // Token valid, ambil data user - sesuaikan dengan kolom tabel users
-            $userStmt = $conn->prepare("SELECT id_user, username FROM users WHERE id_user = ?");
+            // Token valid, ambil data user TERMASUK ROLE - ini yang diperbaiki
+            $userStmt = $conn->prepare("SELECT id_user, username, role FROM users WHERE id_user = ?");
             if (!$userStmt) {
                 error_log("Failed to prepare user statement: " . $conn->error);
                 break;
@@ -57,9 +57,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
             $user = $userResult->fetch_assoc();
             
             if ($user) {
-                // Set session untuk login otomatis
+                // Set session untuk login otomatis - TERMASUK ROLE
                 $_SESSION['user_id'] = $user['id_user'];
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role']; // Tambahkan ini
                 
                 // Generate token baru untuk keamanan (token rotation)
                 $newToken = bin2hex(random_bytes(32));
@@ -97,12 +98,12 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
                 
                 $userStmt->close();
                 
-                // Redirect ke dashboard atau halaman utama
-                if (function_exists('base_url')) {
-                    header("Location: " . base_url());
-                } else {
-                    header("Location: /");
-                }
+                // PERBAIKAN UTAMA: Redirect berdasarkan role seperti di userLogin.php
+                $redirectUrl = ($user['role'] === 'admin') 
+                    ? base_url('admin/dashboard.php') 
+                    : base_url('pages/index.php');
+                
+                header("Location: " . $redirectUrl);
                 exit();
             } else {
                 // User tidak ditemukan, hapus token

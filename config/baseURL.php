@@ -1,5 +1,5 @@
 <?php
-$manualBaseUrl = 'https://localhost/git-project/prakerin-project/'; // Sesuaikan URL disini
+$manualBaseUrl = 'http://localhost/PHP/prakerin-project/'; // Sesuaikan URL disini
 
 if (!defined('BASE_URL')) {
     define('BASE_URL', rtrim($manualBaseUrl, '/') . '/');

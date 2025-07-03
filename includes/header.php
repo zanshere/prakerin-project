@@ -39,9 +39,9 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="<?= base_url('public/icons/bootstrap-icons.css') ?>">
     <!-- AlpineJS -->
-    <script defer src="<?= dist_url('js/bundle.js') ?>"></script>
+    <script src="<?= dist_url('js/bundle.js') ?>"></script>
     <!-- Sweetalert2 -->
-    <script src="<?= dist_url('js/sweetalert2.all.min.js') ?>"></script>
+    
     <style>
     .hamburger span {
         display: block;

@@ -42,8 +42,6 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </section>
 
-<!-- Chart.js CDN -->
-<script src="<?= dist_url('js/bundle.js') ?>"></script>
 <script>
 const ctx = document.getElementById('kasusChart').getContext('2d');
 const kasusChart = new Chart(ctx, {

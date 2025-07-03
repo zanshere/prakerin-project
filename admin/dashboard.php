@@ -43,7 +43,7 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 <!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="<?= dist_url('js/bundle.js') ?>"></script>
 <script>
 const ctx = document.getElementById('kasusChart').getContext('2d');
 const kasusChart = new Chart(ctx, {

@@ -1,8 +1,6 @@
 # Ignoring node_modules
 node_modules/
 
-# Ignoring config/connect.php
+# Ignoring config file
 config/connect.php
-
-# Ignoring config/baseURL.php
 config/baseURL.php

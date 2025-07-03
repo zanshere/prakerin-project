@@ -13,64 +13,64 @@ include __DIR__ . '/../includes/header.php';
 
 
 <section class="p-6">
- <h1 class="text-2xl font-bold text-base-content mb-4">Dashboard Reskrim</h1>
+    <h1 class="text-2xl font-bold text-base-content mb-4">Dashboard Reskrim</h1>
 
-  <!-- Statistik Ringkas -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
-    <p class="text-sm">Total Kasus</p>
-    <h2 class="text-2xl font-semibold text-primary">42</h2>
+    <!-- Statistik Ringkas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
+            <p class="text-sm">Total Kasus</p>
+            <h2 class="text-2xl font-semibold text-primary">42</h2>
+        </div>
+        <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
+            <p class="text-sm">Kasus Pencurian</p>
+            <h2 class="text-2xl font-semibold text-primary">42</h2>
+        </div>
+        <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
+            <p class="text-sm">Kasus Penipuan</p>
+            <h2 class="text-2xl font-semibold text-primary">42</h2>
+        </div>
+        <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
+            <p class="text-sm">Kasus Kekerasan</p>
+            <h2 class="text-2xl font-semibold text-primary">42</h2>
+        </div>
     </div>
-    <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
-    <p class="text-sm">Kasus Pencurian</p>
-    <h2 class="text-2xl font-semibold text-primary">42</h2>
-    </div>
-    <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
-    <p class="text-sm">Kasus Penipuan</p>
-    <h2 class="text-2xl font-semibold text-primary">42</h2>
-    </div>
-    <div class="bg-base-100 shadow rounded-xl p-4 text-base-content">
-    <p class="text-sm">Kasus Kekerasan</p>
-    <h2 class="text-2xl font-semibold text-primary">42</h2>
-    </div>
-  </div>
 
-  <!-- Grafik Kasus per Bulan -->
-  <div class="bg-base-100 shadow rounded-xl p-6">
-    <h2 class="text-xl font-semibold text-base-content mb-4">Grafik Kasus per Bulan</h2>
-    <canvas id="kasusChart" class="w-full h-64 bg-base-100"></canvas>
-  </div>
+    <!-- Grafik Kasus per Bulan -->
+    <div class="bg-base-100 shadow rounded-xl p-6">
+        <h2 class="text-xl font-semibold text-base-content mb-4">Grafik Kasus per Bulan</h2>
+        <canvas id="kasusChart" class="w-full h-64 bg-base-100"></canvas>
+    </div>
 </section>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('kasusChart').getContext('2d');
-  const kasusChart = new Chart(ctx, {
+const ctx = document.getElementById('kasusChart').getContext('2d');
+const kasusChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'],
-      datasets: [{
-        label: 'Jumlah Kasus',
-        data: [10, 14, 9, 7, 12, 6, 6, 6, 6, 6, 6, 6], // Dummy data
-        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-        borderColor: 'rgba(59, 130, 246, 1)',
-        borderWidth: 1,
-        borderRadius: 6
-      }]
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'Jumlah Kasus',
+            data: [10, 14, 9, 7, 12, 6, 6, 6, 6, 6, 6, 6], // Dummy data
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 1,
+            borderRadius: 6
+        }]
     },
     options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 2
-          }
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 2
+                }
+            }
         }
-      }
     }
-  });
+});
 </script>
 
 <?php 

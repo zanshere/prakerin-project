@@ -13,10 +13,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Check for messages
-$success = $_SESSION['success_message'] ?? '';
-$error = $_SESSION['error_message'] ?? '';
-unset($_SESSION['success_message'], $_SESSION['error_message']);
+// Check for alert message
+$alert = $_SESSION['alert'] ?? null;
+unset($_SESSION['alert']);
 
 // Ambil data user dari database
 $users = [];
@@ -37,7 +36,11 @@ if ($result = $conn->query($query)) {
     $result->free();
 } else {
     // Handle query error
-    $error = "Error fetching users: " . $conn->error;
+    $alert = [
+        'type' => 'error',
+        'title' => 'Error',
+        'message' => "Error fetching users: " . $conn->error
+    ];
 }
 
 include __DIR__ . '/../includes/header.php';
@@ -108,6 +111,7 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 // Fungsi untuk menampilkan notifikasi
 function showAlert(icon, title, text) {
@@ -117,7 +121,7 @@ function showAlert(icon, title, text) {
     Swal.fire({
         icon: icon,
         title: title,
-        text: text,
+        html: text,
         confirmButtonColor: '#3b82f6',
         background: isDark ? '#1f2937' : '#ffffff',
         color: isDark ? '#ffffff' : '#1f2937'
@@ -151,13 +155,11 @@ function confirmDelete(userId) {
     });
 }
 
-// Handle notifikasi
-<?php if ($success): ?>
-showAlert('success', 'Success', '<?= addslashes($success) ?>');
-<?php endif; ?>
-
-<?php if ($error): ?>
-showAlert('error', 'Error', '<?= addslashes($error) ?>');
+// Handle alert notifikasi
+<?php if ($alert): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    showAlert('<?= $alert['type'] ?>', '<?= $alert['title'] ?>', '<?= addslashes($alert['message']) ?>');
+});
 <?php endif; ?>
 </script>
 

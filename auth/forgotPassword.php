@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/connect.php';
+require_once __DIR__ . '/../config/baseURL.php';
 
 // Check for messages
 $message = $_SESSION['password_message'] ?? '';
@@ -21,12 +22,12 @@ include __DIR__ . '/../includes/header.php';
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-md mx-auto bg-base-100 rounded-xl shadow-md overflow-hidden p-8">
             <div class="text-center mb-8">
-            <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-16 mx-auto mb-4">
+                <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Logo" class="h-16 mx-auto mb-4">
                 <h1 class="text-2xl font-bold text-base-content">Reset Your Password</h1>
                 <p class="text-sm text-base-content mt-2">Enter your email to receive a reset link</p>
             </div>
 
-            <form method="POST" action="<?= base_url('auth/resetPassword.php') ?>">
+            <form method="POST" action="<?= base_url('functions/requestPasswordReset.php') ?>">
                 <div class="space-y-4">
                     <div class="form-control">
                         <label class="label" for="email">
@@ -67,13 +68,16 @@ function showAlert(icon, title, text) {
 
 // Handle notifikasi
 <?php if ($message): ?>
-showAlert('success', 'Berhasil', '<?= addslashes($message) ?>');
+document.addEventListener('DOMContentLoaded', function() {
+    showAlert('success', 'Success', '<?= addslashes($message) ?>');
+});
 <?php endif; ?>
 
 <?php if ($error): ?>
-showAlert('error', 'Gagal', '<?= addslashes($error) ?>');
+document.addEventListener('DOMContentLoaded', function() {
+    showAlert('error', 'Error', '<?= addslashes($error) ?>');
+});
 <?php endif; ?>
 </script>
 
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

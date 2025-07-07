@@ -1,41 +1,60 @@
 <?php
 require_once __DIR__ . '/../config/connect.php';
 require_once __DIR__ . '/../config/authCheck.php';
+require_once __DIR__ . '/../config/baseURL.php';
 
-// Pastikan hanya admin yang bisa akses
-if ($_SESSION['role'] !== 'admin') {
-    header("Location: " . base_url());
+// Pastikan session sudah start
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Validasi admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    $_SESSION['admin_error'] = 'Unauthorized access';
+    header("Location: " . base_url('auth/login.php'));
     exit();
 }
 
 // Handle messages
 $message = $_SESSION['admin_message'] ?? '';
 $error = $_SESSION['admin_error'] ?? '';
-unset($_SESSION['admin_message'], $_SESSION['admin_error']);
+$successData = $_SESSION['admin_success'] ?? null;
+unset($_SESSION['admin_message'], $_SESSION['admin_error'], $_SESSION['admin_success']);
 
 // Get password reset requests
 $requests = [];
-try {
-    $stmt = $conn->prepare("SELECT prr.*, u.full_name, u.nrp, u.rank 
-                          FROM password_reset_requests prr 
-                          JOIN users u ON prr.user_id = u.id_user 
-                          ORDER BY 
-                            CASE WHEN prr.status = 'pending' THEN 1 ELSE 2 END,
-                            prr.request_date DESC");
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $requests = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-} catch (Exception $e) {
-    $error = "Error loading requests: " . $e->getMessage();
-}
-
-// Count pending requests for badge
 $pendingCount = 0;
-foreach ($requests as $req) {
-    if ($req['status'] === 'pending') {
-        $pendingCount++;
+
+try {
+    // Validasi koneksi database
+    if (!$conn || $conn->connect_error) {
+        throw new Exception("Database connection failed");
     }
+
+    $query = "SELECT prr.*, u.full_name, u.nrp, u.rank 
+              FROM password_reset_requests prr 
+              JOIN users u ON prr.user_id = u.id_user 
+              ORDER BY 
+                CASE WHEN prr.status = 'pending' THEN 1 ELSE 2 END,
+                prr.request_date DESC";
+    
+    $result = $conn->query($query);
+    if (!$result) {
+        throw new Exception("Query failed: " . $conn->error);
+    }
+
+    $requests = $result->fetch_all(MYSQLI_ASSOC);
+    
+    // Count pending requests
+    foreach ($requests as $req) {
+        if ($req['status'] === 'pending') {
+            $pendingCount++;
+        }
+    }
+
+} catch (Exception $e) {
+    error_log("Error in request.php: " . $e->getMessage());
+    $error = "Error loading requests: " . $e->getMessage();
 }
 
 // Force light theme for this page
@@ -47,9 +66,18 @@ include __DIR__ . '/../includes/header.php';
 .status-badge {
     @apply px-2 py-1 rounded-full text-xs font-medium;
 }
-.status-pending { @apply bg-yellow-100 text-yellow-800; }
-.status-completed { @apply bg-green-100 text-green-800; }
-.status-rejected { @apply bg-red-100 text-red-800; }
+
+.status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-completed {
+    @apply bg-green-100 text-green-800;
+}
+
+.status-rejected {
+    @apply bg-red-100 text-red-800;
+}
 </style>
 
 <div class="container mx-auto px-4 py-8">
@@ -62,7 +90,7 @@ include __DIR__ . '/../includes/header.php';
             </h1>
             <p class="text-base-content/70 mt-2">Kelola permintaan reset password dari user</p>
         </div>
-        
+
         <!-- Stats Card -->
         <div class="stats shadow">
             <div class="stat">
@@ -112,11 +140,14 @@ include __DIR__ . '/../includes/header.php';
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="font-bold text-base-content"><?= htmlspecialchars($request['full_name']) ?></div>
+                                        <div class="font-bold text-base-content">
+                                            <?= htmlspecialchars($request['full_name']) ?></div>
                                         <div class="text-sm text-base-content/70">
-                                            <?= htmlspecialchars($request['rank']) ?> • <?= htmlspecialchars($request['nrp']) ?>
+                                            <?= htmlspecialchars($request['rank']) ?> •
+                                            <?= htmlspecialchars($request['nrp']) ?>
                                         </div>
-                                        <div class="text-xs text-base-content/50">@<?= htmlspecialchars($request['username']) ?></div>
+                                        <div class="text-xs text-base-content/50">
+                                            @<?= htmlspecialchars($request['username']) ?></div>
                                     </div>
                                 </div>
                             </td>
@@ -144,13 +175,15 @@ include __DIR__ . '/../includes/header.php';
                             <td>
                                 <?php if ($request['status'] === 'pending'): ?>
                                 <div class="flex space-x-2">
-                                    <button onclick="approveRequest(<?= $request['id'] ?>, '<?= htmlspecialchars($request['username']) ?>')" 
-                                            class="btn btn-success btn-sm">
+                                    <button
+                                        onclick="approveRequest(<?= $request['id'] ?>, '<?= htmlspecialchars($request['username']) ?>')"
+                                        class="btn btn-success btn-sm">
                                         <i class="bi bi-check-lg"></i>
                                         Setuju
                                     </button>
-                                    <button onclick="rejectRequest(<?= $request['id'] ?>, '<?= htmlspecialchars($request['username']) ?>')" 
-                                            class="btn btn-error btn-sm">
+                                    <button
+                                        onclick="rejectRequest(<?= $request['id'] ?>, '<?= htmlspecialchars($request['username']) ?>')"
+                                        class="btn btn-error btn-sm">
                                         <i class="bi bi-x-lg"></i>
                                         Tolak
                                     </button>
@@ -158,9 +191,9 @@ include __DIR__ . '/../includes/header.php';
                                 <?php else: ?>
                                 <span class="text-base-content/50 text-sm">
                                     <?php if ($request['status'] === 'completed'): ?>
-                                        <i class="bi bi-check-circle text-success"></i> Selesai diproses
+                                    <i class="bi bi-check-circle text-success"></i> Selesai diproses
                                     <?php else: ?>
-                                        <i class="bi bi-x-circle text-error"></i> Ditolak
+                                    <i class="bi bi-x-circle text-error"></i> Ditolak
                                     <?php endif; ?>
                                 </span>
                                 <?php endif; ?>
@@ -176,6 +209,7 @@ include __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
+// Fungsi untuk menampilkan notifikasi
 function showAlert(icon, title, text) {
     const theme = document.documentElement.getAttribute('data-theme') || 'light';
     const isDark = theme === 'dark';
@@ -229,42 +263,47 @@ function approveRequest(requestId, username) {
 
             // Process request
             fetch('<?= base_url("functions/processPasswordReset.php") ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=approve&request_id=${requestId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        html: `Password untuk user <strong>${username}</strong> telah direset.<br><br>
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=approve&request_id=${requestId}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            html: `Password untuk user <strong>${username}</strong> telah direset.<br><br>
                                <div class="bg-base-200 p-4 rounded-lg mt-4">
                                    <strong>Password Baru:</strong><br>
                                    <code class="text-lg font-mono bg-base-300 px-2 py-1 rounded">${data.new_password}</code><br>
-                                   <small class="text-warning">Salin password ini dan kirimkan ke user melalui email</small>
+                                   <small class="text-warning">Salin password ini dan kirimkan ke user</small>
                                </div>`,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3b82f6',
-                        background: isDark ? '#1f2937' : '#ffffff',
-                        color: isDark ? '#ffffff' : '#1f2937',
-                        customClass: {
-                            popup: 'rounded-xl'
-                        }
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    showAlert('error', 'Gagal!', data.message || 'Terjadi kesalahan saat memproses permintaan');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Error!', 'Terjadi kesalahan sistem');
-            });
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3b82f6',
+                            background: isDark ? '#1f2937' : '#ffffff',
+                            color: isDark ? '#ffffff' : '#1f2937',
+                            customClass: {
+                                popup: 'rounded-xl'
+                            }
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('error', 'Error!', error.message || 'Terjadi kesalahan sistem');
+                });
         }
     });
 }
@@ -291,37 +330,61 @@ function rejectRequest(requestId, username) {
         if (result.isConfirmed) {
             // Process rejection
             fetch('<?= base_url("functions/processPasswordReset.php") ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=reject&request_id=${requestId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', 'Berhasil!', `Permintaan dari ${username} telah ditolak`);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showAlert('error', 'Gagal!', data.message || 'Terjadi kesalahan saat memproses permintaan');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'Error!', 'Terjadi kesalahan sistem');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=reject&request_id=${requestId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', 'Berhasil!', `Permintaan dari ${username} telah ditolak`);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showAlert('error', 'Gagal!', data.message ||
+                            'Terjadi kesalahan saat memproses permintaan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('error', 'Error!', 'Terjadi kesalahan sistem');
+                });
         }
     });
 }
 
 // Handle messages from server
-<?php if ($message): ?>
-showAlert('success', 'Berhasil!', '<?= addslashes($message) ?>');
-<?php endif; ?>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($error): ?>
+    showAlert('error', 'Error!', '<?= addslashes($error) ?>');
+    <?php endif; ?>
 
-<?php if ($error): ?>
-showAlert('error', 'Error!', '<?= addslashes($error) ?>');
-<?php endif; ?>
+    <?php if ($message): ?>
+    showAlert('success', 'Success!', '<?= addslashes($message) ?>');
+    <?php endif; ?>
+
+    <?php if ($successData): ?>
+    Swal.fire({
+        title: '<?= addslashes($successData['title'] ?? 'Success') ?>',
+        html: `<?= addslashes($successData['message'] ?? '') ?><br><br>
+                   <div class="bg-base-200 p-4 rounded-lg mt-4">
+                       <strong>Password Baru:</strong><br>
+                       <code class="text-lg font-mono bg-base-300 px-2 py-1 rounded"><?= addslashes($successData['new_password'] ?? '') ?></code><br>
+                       <small class="text-warning">Salin password ini dan kirimkan ke user</small>
+                   </div>`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3b82f6',
+        background: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1f2937' :
+            '#ffffff',
+        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffffff' : '#1f2937',
+        customClass: {
+            popup: 'rounded-xl'
+        }
+    });
+    <?php endif; ?>
+});
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

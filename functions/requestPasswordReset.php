@@ -1,22 +1,15 @@
 <?php
 require_once __DIR__ . '/../config/connect.php';
-include_once __DIR__ . '/../config/baseURL.php';
+require_once __DIR__ . '/../config/baseURL.php';
+
+// Pastikan session sudah start
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Function to generate secure reset token
 function generateResetToken() {
     return bin2hex(random_bytes(32));
-}
-
-// Function to create notification for admin
-function createAdminNotification($conn, $title, $message) {
-    $stmt = $conn->prepare("INSERT INTO notifications (user_id, type, title, message) 
-                           SELECT id_user, 'password_reset', ?, ? 
-                           FROM users WHERE role = 'admin'");
-    if ($stmt) {
-        $stmt->bind_param("ss", $title, $message);
-        $stmt->execute();
-        $stmt->close();
-    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,14 +30,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Cek apakah email terdaftar dan user aktif
-        $stmt = $conn->prepare("SELECT id_user, username, full_name FROM users WHERE email = ? AND status = 'active'");
+        // Validasi koneksi database
+        if (!$conn || $conn->connect_error) {
+            throw new Exception("Koneksi database gagal");
+        }
+
+        // Cek apakah email terdaftar
+        $stmt = $conn->prepare("SELECT id_user, username, full_name FROM users WHERE email = ?");
+        if (!$stmt) {
+            throw new Exception("Error persiapan query: " . $conn->error);
+        }
+
         $stmt->bind_param("s", $email);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Error eksekusi query: " . $stmt->error);
+        }
+
         $result = $stmt->get_result();
         
         if ($result->num_rows === 0) {
-            $_SESSION['password_error'] = 'Email tidak terdaftar atau akun tidak aktif';
+            $_SESSION['password_error'] = 'Email tidak terdaftar';
             header("Location: " . base_url('auth/forgotPassword.php'));
             exit();
         }
@@ -52,16 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $result->fetch_assoc();
         $stmt->close();
 
-        // Cek apakah sudah ada request pending dari user ini
+        // Cek apakah sudah ada request pending dalam 24 jam terakhir
         $checkStmt = $conn->prepare("SELECT id FROM password_reset_requests 
                                    WHERE user_id = ? AND status = 'pending' 
                                    AND request_date > DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+        if (!$checkStmt) {
+            throw new Exception("Error persiapan query: " . $conn->error);
+        }
+
         $checkStmt->bind_param("i", $user['id_user']);
-        $checkStmt->execute();
+        if (!$checkStmt->execute()) {
+            throw new Exception("Error eksekusi query: " . $checkStmt->error);
+        }
+
         $checkResult = $checkStmt->get_result();
         
         if ($checkResult->num_rows > 0) {
-            $_SESSION['password_error'] = 'Anda sudah memiliki permintaan reset password yang sedang diproses. Harap tunggu 24 jam sebelum mengajukan kembali.';
+            $_SESSION['password_error'] = 'Anda sudah memiliki permintaan reset password yang sedang diproses';
             header("Location: " . base_url('auth/forgotPassword.php'));
             exit();
         }
@@ -74,24 +86,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insertStmt = $conn->prepare("INSERT INTO password_reset_requests 
                                     (user_id, username, email, request_date, status, reset_token) 
                                     VALUES (?, ?, ?, NOW(), 'pending', ?)");
+        if (!$insertStmt) {
+            throw new Exception("Error persiapan query: " . $conn->error);
+        }
+
         $insertStmt->bind_param("isss", $user['id_user'], $user['username'], $email, $resetToken);
         
         if ($insertStmt->execute()) {
-            $insertStmt->close();
-            
-            // Buat notifikasi untuk admin
-            $notifTitle = "Permintaan Reset Password Baru";
-            $notifMessage = "User {$user['full_name']} ({$user['username']}) mengajukan permintaan reset password untuk email: {$email}";
-            createAdminNotification($conn, $notifTitle, $notifMessage);
-            
-            $_SESSION['password_message'] = 'Permintaan reset password telah dikirim ke admin. Anda akan mendapat email berisi password baru dalam waktu maksimal 1x24 jam. Silakan cek email Anda secara berkala.';
+            $_SESSION['password_message'] = 'Permintaan reset password telah dikirim ke admin. Anda akan mendapat email berisi password baru dalam waktu maksimal 1x24 jam.';
         } else {
-            $_SESSION['password_error'] = 'Gagal mengajukan permintaan. Silakan coba lagi.';
+            throw new Exception("Error eksekusi query: " . $insertStmt->error);
         }
 
+        $insertStmt->close();
+
     } catch (Exception $e) {
-        error_log("Error in password reset request: " . $e->getMessage());
-        $_SESSION['password_error'] = 'Terjadi kesalahan sistem. Silakan coba lagi nanti.';
+        error_log("Error in requestPasswordReset.php: " . $e->getMessage());
+        $_SESSION['password_error'] = 'Terjadi kesalahan sistem. Silakan coba lagi nanti. Error: ' . $e->getMessage();
     }
 
     header("Location: " . base_url('auth/forgotPassword.php'));

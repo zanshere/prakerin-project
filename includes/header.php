@@ -7,8 +7,8 @@ require_once __DIR__ . '/../config/authCheck.php';
 $isLoggedIn = isset($_SESSION['user_id']);
 $username = $isLoggedIn ? $_SESSION['username'] : 'Username';
 $profileImage = $isLoggedIn ? 
-    (isset($_SESSION['profile_image']) ? base_url('public/uploads/profiles/' . $_SESSION['profile_image']) : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg') 
-    : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg';
+    (isset($_SESSION['profile_image']) ? base_url('public/uploads/profiles/' . $_SESSION['profile_image']) : base_url('public/uploads/profiles/profil.jpg')) 
+    : base_url('public/uploads/profiles/profil.jpg');
 $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
 ?>
 
@@ -235,13 +235,6 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
             <div class="overflow-y-auto h-full pb-20">
                 <!-- Menu Items -->
                 <ul class="menu p-4 gap-2">
-                    <li>
-                        <a href="<?= base_url() ?>" class="flex items-center">
-                            <i class="bi bi-home text-xl text-primary mr-3"></i>
-                            <span class="font-medium">Home</span>
-                        </a>
-                    </li>
-
                     <?php if ($userRole === 'admin'): ?>
                     <!-- Menu khusus admin -->
                     <li>

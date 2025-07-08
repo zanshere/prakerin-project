@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config/connect.php';
 require_once __DIR__ . '/../config/authCheck.php';
 require_once __DIR__ . '/../config/baseURL.php';
 
-// Redirect jika belum login
+// Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: " . base_url('auth/login.php'));
     exit();
@@ -142,7 +142,7 @@ if ($stmt = $conn->prepare($check_email_query)) {
 
 // Handle profile image upload
 $profile_image = $current_profile_image;
-$uploadDir = __DIR__ . '/../public/uploads/profiles/';
+$uploadDir = __DIR__ . '/../../public/uploads/profiles/';
 
 // If remove image is checked
 if ($remove_image) {
@@ -243,6 +243,13 @@ if (!empty($password)) {
 // Execute the update
 if ($stmt->execute()) {
     if ($stmt->affected_rows > 0) {
+        // Update session data if editing current user
+        if ($_SESSION['user_id'] == $user_id) {
+            $_SESSION['username'] = $username;
+            $_SESSION['profile_image'] = $profile_image;
+            $_SESSION['role'] = $role;
+        }
+        
         $_SESSION['alert'] = [
             'type' => 'success',
             'title' => 'Success',

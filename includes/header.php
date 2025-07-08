@@ -118,7 +118,7 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
                 </li>
                 <li>
                     <a href="<?= base_url('admin/request.php') ?>" class="btn btn-ghost btn-sm">
-                        <i class="bi bi-stack text-lg"></i>
+                        <i class="bi bi-inbox text-lg"></i>
                         Request
                     </a>
                 </li>

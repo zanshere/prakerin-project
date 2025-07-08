@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
     
     // Cek user (termasuk role)
-    $stmt = $conn->prepare("SELECT id_user, username, password, role FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id_user, username, password, role, profile_image FROM users WHERE username = ?");
     if (!$stmt) {
         $_SESSION['login_error'] = 'Database error: ' . $conn->error;
         header("Location: " . base_url('auth/login.php'));
@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $_SESSION['user_id'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['profile_image'] = $user['profile_image'];
             
             // Handle Remember Me
             if (isset($_POST['remember']) && !empty($_POST['remember'])) {

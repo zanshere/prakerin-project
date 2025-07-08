@@ -30,6 +30,8 @@ $phone = trim($_POST['phone'] ?? '');
 $nrp = trim($_POST['nrp'] ?? '');
 $rank = $_POST['rank'] ?? '';
 $role = $_POST['role'] ?? '';
+$current_profile_image = $_POST['current_profile_image'] ?? 'profil.jpg';
+$remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] == 'on';
 
 // Validation
 $errors = [];
@@ -138,14 +140,80 @@ if ($stmt = $conn->prepare($check_email_query)) {
     $stmt->close();
 }
 
+// Handle profile image upload
+$profile_image = $current_profile_image;
+$uploadDir = __DIR__ . '/../public/uploads/profiles/';
+
+// If remove image is checked
+if ($remove_image) {
+    // Delete old image if it's not the default one
+    if ($current_profile_image && $current_profile_image !== 'profil.jpg') {
+        $oldImagePath = $uploadDir . $current_profile_image;
+        if (file_exists($oldImagePath)) {
+            unlink($oldImagePath);
+        }
+    }
+    $profile_image = 'profil.jpg';
+} 
+// If new image is uploaded
+elseif (!empty($_FILES['profile_image']['name'])) {
+    $file = $_FILES['profile_image'];
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    $maxSize = 2 * 1024 * 1024; // 2MB
+
+    // Validate file
+    if (!in_array($file['type'], $allowedTypes)) {
+        $_SESSION['alert'] = [
+            'type' => 'error',
+            'title' => 'Error',
+            'message' => 'Invalid file type. Only JPG, PNG, GIF allowed.'
+        ];
+        header("Location: " . base_url('admin/editUser.php?id=' . urlencode($user_id)));
+        exit();
+    }
+
+    if ($file['size'] > $maxSize) {
+        $_SESSION['alert'] = [
+            'type' => 'error',
+            'title' => 'Error',
+            'message' => 'File too large. Max 2MB allowed.'
+        ];
+        header("Location: " . base_url('admin/editUser.php?id=' . urlencode($user_id)));
+        exit();
+    }
+
+    // Delete old image if it's not the default one
+    if ($current_profile_image && $current_profile_image !== 'profil.jpg') {
+        $oldImagePath = $uploadDir . $current_profile_image;
+        if (file_exists($oldImagePath)) {
+            unlink($oldImagePath);
+        }
+    }
+
+    // Generate unique filename
+    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $profile_image = uniqid('profile_') . '.' . $ext;
+
+    // Move uploaded file
+    if (!move_uploaded_file($file['tmp_name'], $uploadDir . $profile_image)) {
+        $_SESSION['alert'] = [
+            'type' => 'error',
+            'title' => 'Error',
+            'message' => 'Failed to upload profile image.'
+        ];
+        header("Location: " . base_url('admin/editUser.php?id=' . urlencode($user_id)));
+        exit();
+    }
+}
+
 // Prepare update query
 if (!empty($password)) {
     // Update with password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $update_query = "UPDATE users SET username = ?, email = ?, password = ?, full_name = ?, phone = ?, nrp = ?, `rank` = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id_user = ?";
+    $update_query = "UPDATE users SET username = ?, email = ?, password = ?, full_name = ?, phone = ?, nrp = ?, `rank` = ?, role = ?, profile_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id_user = ?";
     
     if ($stmt = $conn->prepare($update_query)) {
-        $stmt->bind_param("ssssssssi", $username, $email, $hashed_password, $full_name, $phone, $nrp, $rank, $role, $user_id);
+        $stmt->bind_param("sssssssssi", $username, $email, $hashed_password, $full_name, $phone, $nrp, $rank, $role, $profile_image, $user_id);
     } else {
         $_SESSION['alert'] = [
             'type' => 'error',
@@ -157,10 +225,10 @@ if (!empty($password)) {
     }
 } else {
     // Update without password
-    $update_query = "UPDATE users SET username = ?, email = ?, full_name = ?, phone = ?, nrp = ?, `rank` = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id_user = ?";
+    $update_query = "UPDATE users SET username = ?, email = ?, full_name = ?, phone = ?, nrp = ?, `rank` = ?, role = ?, profile_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id_user = ?";
     
     if ($stmt = $conn->prepare($update_query)) {
-        $stmt->bind_param("sssssssi", $username, $email, $full_name, $phone, $nrp, $rank, $role, $user_id);
+        $stmt->bind_param("ssssssssi", $username, $email, $full_name, $phone, $nrp, $rank, $role, $profile_image, $user_id);
     } else {
         $_SESSION['alert'] = [
             'type' => 'error',

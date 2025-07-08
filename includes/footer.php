@@ -3,7 +3,6 @@
     style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;">
     <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
         <aside class="flex items-center gap-4">
-            <img src="<?= base_url('assets/images/bareskrim-logo.png') ?>" alt="Bareskrim Logo" class="w-15 h-16 rounded" />
             <p class="text-sm sm:text-base">Copyright © <script>document.write(new Date().getFullYear())</script> - All rights reserved</p>
         </aside>
         <nav class="flex gap-4 mt-4 sm:mt-0 text-xl">

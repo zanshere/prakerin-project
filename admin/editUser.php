@@ -33,7 +33,7 @@ if (!$user_id || !is_numeric($user_id)) {
 
 // Fetch user data
 $user = null;
-$query = "SELECT id_user, username, email, full_name, phone, nrp, `rank`, role 
+$query = "SELECT id_user, username, email, full_name, phone, nrp, `rank`, role, profile_image 
           FROM users WHERE id_user = ?";
 
 if ($stmt = $conn->prepare($query)) {
@@ -73,10 +73,40 @@ include __DIR__ . '/../includes/header.php';
             <p class="text-sm text-base-content/70">Update user information</p>
         </div>
 
-        <form id="editUserForm" method="POST" action="<?= base_url('functions/updateUser.php') ?>">
+        <form id="editUserForm" method="POST" action="<?= base_url('functions/updateUser.php') ?>" enctype="multipart/form-data">
             <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id_user']) ?>">
+            <input type="hidden" name="current_profile_image" value="<?= htmlspecialchars($user['profile_image']) ?>">
             
             <div class="space-y-4">
+                <!-- Profile Image Upload -->
+                <div class="form-control">
+                    <label class="label" for="profile_image">
+                        <span class="label-text">Profile Image</span>
+                    </label>
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="avatar">
+                            <div class="w-24 h-24 rounded-full">
+                                <img id="imagePreview" 
+                                     src="<?= base_url('public/uploads/profiles/' . ($user['profile_image'] ? htmlspecialchars($user['profile_image']) : 'profil.jpg')) ?>" 
+                                     alt="Profile Preview" class="object-cover">
+                            </div>
+                        </div>
+                        <input type="file" id="profile_image" name="profile_image" 
+                               accept="image/jpeg,image/jpg,image/png,image/gif" 
+                               class="file-input file-input-bordered file-input-sm w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text-alt">Max 2MB (JPG, PNG, GIF). Leave empty to keep current image.</span>
+                        </label>
+                        <?php if ($user['profile_image'] && $user['profile_image'] !== 'profil.jpg'): ?>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remove_image" name="remove_image" class="checkbox checkbox-sm mr-2">
+                            <label for="remove_image" class="text-sm">Remove current image</label>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Rest of the form remains exactly the same -->
                 <div class="form-control">
                     <label class="label" for="username">
                         <span class="label-text">Username</span>
@@ -187,7 +217,6 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 // Fungsi untuk menampilkan notifikasi
 function showAlert(icon, title, text) {
@@ -203,6 +232,34 @@ function showAlert(icon, title, text) {
         color: isDark ? '#ffffff' : '#1f2937'
     });
 }
+
+// Preview image sebelum upload
+document.getElementById('profile_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Validasi ukuran file (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showAlert('error', 'File Too Large', 'Please select an image smaller than 2MB');
+            e.target.value = '';
+            return;
+        }
+
+        // Validasi tipe file
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            showAlert('error', 'Invalid File Type', 'Please select a valid image file (JPG, PNG, GIF)');
+            e.target.value = '';
+            return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
 // Handle notifikasi dari session
 <?php if ($alert): ?>

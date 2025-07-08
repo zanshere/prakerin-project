@@ -19,7 +19,7 @@ unset($_SESSION['alert']);
 
 // Ambil data user dari database
 $users = [];
-$query = "SELECT id_user, username, email, full_name, phone, nrp, `rank`, created_at 
+$query = "SELECT id_user, username, email, full_name, phone, nrp, `rank`, profile_image, created_at 
           FROM users ORDER BY created_at DESC";
 
 // Check if connection exists
@@ -79,9 +79,16 @@ include __DIR__ . '/../includes/header.php';
                         <td><?= htmlspecialchars($user['id_user'] ?? '') ?></td>
                         <td>
                             <div class="flex items-center space-x-3">
+                                <div class="avatar">
+                                    <div class="w-12 h-12 rounded-full">
+                                        <img src="<?= base_url('public/uploads/profiles/' . ($user['profile_image'] ? htmlspecialchars($user['profile_image']) : 'profil.jpg')) ?>"
+                                            alt="Profile" class="object-cover">
+                                    </div>
+                                </div>
                                 <div>
                                     <div class="font-bold"><?= htmlspecialchars($user['full_name'] ?? '') ?></div>
-                                    <div class="text-sm opacity-50"><?= htmlspecialchars($user['username'] ?? '') ?></div>
+                                    <div class="text-sm opacity-50"><?= htmlspecialchars($user['username'] ?? '') ?>
+                                    </div>
                                     <div class="text-sm opacity-50"><?= htmlspecialchars($user['email'] ?? '') ?></div>
                                     <div class="text-sm opacity-50"><?= htmlspecialchars($user['phone'] ?? '') ?></div>
                                 </div>
@@ -89,15 +96,16 @@ include __DIR__ . '/../includes/header.php';
                         </td>
                         <td><?= htmlspecialchars($user['nrp'] ?? '') ?></td>
                         <td><?= htmlspecialchars($user['rank'] ?? '') ?></td>
-                        <td><?= isset($user['created_at']) ? date('d M Y H:i', strtotime($user['created_at'])) : '' ?></td>
+                        <td><?= isset($user['created_at']) ? date('d M Y H:i', strtotime($user['created_at'])) : '' ?>
+                        </td>
                         <td>
                             <div class="flex gap-2">
-                                <a href="<?= base_url('admin/editUser.php?id=' . urlencode($user['id_user'] ?? '')) ?>" 
-                                   class="btn btn-sm btn-outline btn-info">
+                                <a href="<?= base_url('admin/editUser.php?id=' . urlencode($user['id_user'] ?? '')) ?>"
+                                    class="btn btn-sm btn-outline btn-info">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <button onclick="confirmDelete(<?= intval($user['id_user'] ?? 0) ?>)" 
-                                        class="btn btn-sm btn-outline btn-error">
+                                <button onclick="confirmDelete(<?= intval($user['id_user'] ?? 0) ?>)"
+                                    class="btn btn-sm btn-outline btn-error">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -111,7 +119,6 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 // Fungsi untuk menampilkan notifikasi
 function showAlert(icon, title, text) {

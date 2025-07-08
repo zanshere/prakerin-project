@@ -23,8 +23,30 @@ include __DIR__ . '/../includes/header.php';
             <p class="text-sm text-base-content/70">Fill the form to create a new user account</p>
         </div>
 
-        <form id="addUserForm" method="POST" action="<?= base_url('functions/createUser.php') ?>">
+        <form id="addUserForm" method="POST" action="<?= base_url('functions/createUser.php') ?>"
+            enctype="multipart/form-data">
             <div class="space-y-4">
+                <!-- Profile Image Upload -->
+                <div class="form-control">
+                    <label class="label" for="profile_image">
+                        <span class="label-text">Profile Image</span>
+                    </label>
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="avatar">
+                            <div class="w-24 h-24 rounded-full">
+                                <img id="imagePreview" src="<?= base_url('public/uploads/profiles/profil.jpg') ?>"
+                                    alt="Profile Preview" class="object-cover">
+                            </div>
+                        </div>
+                        <input type="file" id="profile_image" name="profile_image"
+                            accept="image/jpeg,image/jpg,image/png,image/gif"
+                            class="file-input file-input-bordered file-input-sm w-full max-w-xs">
+                        <label class="label">
+                            <span class="label-text-alt">Max 2MB (JPG, PNG, GIF)</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-control">
                     <label class="label" for="username">
                         <span class="label-text">Username</span>
@@ -123,6 +145,47 @@ function showAlert(icon, title, text) {
         color: isDark ? '#ffffff' : '#1f2937'
     });
 }
+
+// Preview image sebelum upload
+document.getElementById('profile_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Validasi ukuran file (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showAlert('error', 'File Too Large', 'Please select an image smaller than 2MB');
+            e.target.value = '';
+            return;
+        }
+
+        // Validasi tipe file
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            showAlert('error', 'Invalid File Type', 'Please select a valid image file (JPG, PNG, GIF)');
+            e.target.value = '';
+            return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Reset to default image if no file selected
+        document.getElementById('imagePreview').src = '<?= base_url('public/uploads/profiles/profil.jpg') ?>';
+    }
+});
+
+// Input mask untuk NRP (hanya angka)
+document.getElementById('nrp').addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, '').slice(0, 8);
+});
+
+// Input mask untuk phone number
+document.getElementById('phone').addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9+\-\s]/g, '');
+});
 
 // Handle notifikasi
 <?php if ($success): ?>

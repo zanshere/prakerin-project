@@ -125,6 +125,12 @@ $userRole = $isLoggedIn ? $_SESSION['role'] : ''; // 'admin' atau 'user'
                 <?php else: ?>
                 <!-- Menu untuk user biasa -->
                 <li>
+                    <a href="<?= base_url('pages/index.php') ?>" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-house text-lg"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
                     <a href="<?= base_url('pages/user/dashboard.php') ?>" class="btn btn-ghost btn-sm">
                         <i class="bi bi-person text-lg"></i>
                         Dashboard

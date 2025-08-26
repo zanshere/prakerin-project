@@ -92,8 +92,9 @@ include_once __DIR__ . '/../includes/header.php';
                 
                 <div class="card-actions justify-end">
                     <button class="btn btn-primary btn-sm group-hover:btn-outline transition-all duration-300">
-                        <i class="bi bi-arrow-right mr-1"></i>
-                        Kelola
+                        <i class="bi bi-arrow-right mr-1">
+                            <a href="<?= base_url('pages/surat/surat-keluar.php') ?>" class="text-decoration-none">Kelola</a>
+                        </i>
                     </button>
                 </div>
             </div>
@@ -123,8 +124,9 @@ include_once __DIR__ . '/../includes/header.php';
                 
                 <div class="card-actions justify-end">
                     <button class="btn btn-warning btn-sm group-hover:btn-outline transition-all duration-300">
-                        <i class="bi bi-arrow-right mr-1"></i>
-                        Kelola
+                        <i class="bi bi-arrow-right mr-1">
+                            <a href="<?= base_url('pages/surat/surat-penangkapan.php') ?>" class="text-decoration-none">Kelola</a>
+                        </i>
                     </button>
                 </div>
             </div>
@@ -154,8 +156,9 @@ include_once __DIR__ . '/../includes/header.php';
                 
                 <div class="card-actions justify-end">
                     <button class="btn btn-error btn-sm group-hover:btn-outline transition-all duration-300">
-                        <i class="bi bi-arrow-right mr-1"></i>
-                        Kelola
+                        <i class="bi bi-arrow-right mr-1">
+                            <a href="<?= base_url('pages/surat/surat-penahanan.php') ?>" class="text-decoration-none">Kelola</a>
+                        </i>
                     </button>
                 </div>
             </div>
@@ -185,8 +188,9 @@ include_once __DIR__ . '/../includes/header.php';
                 
                 <div class="card-actions justify-end">
                     <button class="btn btn-info btn-sm group-hover:btn-outline transition-all duration-300">
-                        <i class="bi bi-arrow-right mr-1"></i>
-                        Kelola
+                        <i class="bi bi-arrow-right mr-1">
+                            <a href="<?= base_url('pages/surat/surat-penahanan.php') ?>" class="text-decoration-none">Kelola</a>
+                        </i>
                     </button>
                 </div>
             </div>
@@ -216,8 +220,9 @@ include_once __DIR__ . '/../includes/header.php';
                 
                 <div class="card-actions justify-end">
                     <button class="btn btn-success btn-sm group-hover:btn-outline transition-all duration-300">
-                        <i class="bi bi-arrow-right mr-1"></i>
-                        Kelola
+                        <i class="bi bi-arrow-right mr-1">
+                            <a href="<?= base_url('pages/surat/surat-tugas.php') ?>" class="text-decoration-none">Kelola</a>
+                        </i>
                     </button>
                 </div>
             </div>

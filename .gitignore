@@ -3,3 +3,4 @@ node_modules/
 
 # Ignoring config file
 config/connect.php
+config/baseURL.php
